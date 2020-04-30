@@ -1,9 +1,9 @@
-package com.dili.gateway.component;
+package com.dili.gateway.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
-import org.springframework.cloud.gateway.route.RouteDefinitionWriter;
+import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -13,13 +13,12 @@ import reactor.core.publisher.Mono;
 
 /**
  * 动态路由服务
- * @author wangmi
  */
 @Service
-public class DynamicRouteService  implements ApplicationEventPublisherAware {
+public class DynamicRouteService implements ApplicationEventPublisherAware {
 
     @Autowired
-    private RouteDefinitionWriter routeDefinitionWriter;
+    private RouteDefinitionRepository routeDefinitionWriter;
     private ApplicationEventPublisher publisher;
 
     @Override
@@ -27,15 +26,39 @@ public class DynamicRouteService  implements ApplicationEventPublisherAware {
         this.publisher = applicationEventPublisher;
     }
 
+    /**
+     * 查询路由
+     * @return
+     */
+    public String list() {
+        routeDefinitionWriter.getRouteDefinitions().subscribe(routeDefinition ->{
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.
+            routeDefinition.getPredicates()
+            System.out.println(String.format("id:%s,uri:%s,order:%s",
+                    routeDefinition.getId(),
+                    routeDefinition.getUri(),
+                    routeDefinition.getOrder()));
+        });
+        return "success";
+    }
 
-    //增加路由
+    /**
+     * 增加路由
+     * @param definition
+     * @return
+     */
     public String add(RouteDefinition definition) {
         routeDefinitionWriter.save(Mono.just(definition)).subscribe();
         this.publisher.publishEvent(new RefreshRoutesEvent(this));
         return "success";
     }
 
-    //更新路由
+    /**
+     * 更新路由
+     * @param definition
+     * @return
+     */
     public String update(RouteDefinition definition) {
         try {
             delete(definition.getId());
@@ -51,7 +74,11 @@ public class DynamicRouteService  implements ApplicationEventPublisherAware {
         }
     }
 
-    //删除路由
+    /**
+     * 删除路由
+     * @param id
+     * @return
+     */
     public Mono<ResponseEntity<Object>> delete(String id) {
         return this.routeDefinitionWriter.delete(Mono.just(id)).then(Mono.defer(() -> {
             return Mono.just(ResponseEntity.ok().build());
@@ -61,4 +88,5 @@ public class DynamicRouteService  implements ApplicationEventPublisherAware {
             return Mono.just(ResponseEntity.notFound().build());
         });
     }
+
 }

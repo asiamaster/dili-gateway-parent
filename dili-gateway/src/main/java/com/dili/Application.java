@@ -4,6 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
@@ -21,6 +23,13 @@ public class Application {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+//    @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes().route(predicateSpec ->
+                predicateSpec.path("/customer/**").uri("lb://customer-service").id("customer-service")
+        ).build();
     }
 
     public static void main(String[] args) {

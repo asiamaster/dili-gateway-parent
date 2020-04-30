@@ -29,7 +29,7 @@ spring.cloud.gateway.discovery.locator.enabled=true
 spring.cloud.gateway.discovery.locator.lower-case-service-id=true
 spring.cloud.gateway.routes[0].id=customer-service
 spring.cloud.gateway.routes[0].uri=lb://customer-service
-spring.cloud.gateway.routes[0].predicates[0]= Path=/customer-service/**
+spring.cloud.gateway.routes[0].predicates[0]= Path=/customer/**
 
 spring.cloud.gateway.globalcors.cors-configurations.'[/**]'.allowed-origins[0]=http://uap.diligrp.com
 spring.cloud.gateway.globalcors.cors-configurations.'[/**]'.allowed-methods[0]=GET
