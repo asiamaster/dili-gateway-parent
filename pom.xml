@@ -26,11 +26,11 @@
 		<!-- MyBatis Generator -->
 		<!-- Java接口和实体类 -->
 		<targetJavaProject>${basedir}/src/main/java</targetJavaProject>
-		<targetMapperPackage>com.dili.gateway.mapper</targetMapperPackage>
-		<targetModelPackage>com.dili.gateway.domain</targetModelPackage>
-		<targetServicePackage>com.dili.gateway.service</targetServicePackage>
-		<targetProviderPackage>com.dili.gateway.provider</targetProviderPackage>
-		<targetControllerPackage>com.dili.gateway.controller</targetControllerPackage>
+		<targetMapperPackage>com.dili.gw.mapper</targetMapperPackage>
+		<targetModelPackage>com.dili.gw.domain</targetModelPackage>
+		<targetServicePackage>com.dili.gw.service</targetServicePackage>
+		<targetProviderPackage>com.dili.gw.provider</targetProviderPackage>
+		<targetControllerPackage>com.dili.gw.api</targetControllerPackage>
 		<templateRootDir>${basedir}/mbg-templates</templateRootDir>
 		<projectdir>${basedir}</projectdir>
 
