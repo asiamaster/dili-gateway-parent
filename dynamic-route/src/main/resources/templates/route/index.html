@@ -1,3 +1,155 @@
- <#body>
-    hello world
-</#body>
+<#bs4Body>
+<style>
+    .w-200px{width: 200px!important;}
+    .w-100px{width: 100px!important;}
+</style>
+<!--
+ 内联元素:让元素排成一行显示出来，且高度和宽度由内容决定，不能用css控制
+ 块状元素:独立占一行
+ 内联元素与块状元素对立
+ 内联(inline)表单:表单排在一行显示，只有在from中指定  class="form-inline"即可让表单成内联显示
+      一定要添加 label 标签
+      如果你没有为每个输入控件设置 label 标签，屏幕阅读器将无法正确识别。对于这些内联表单，你可以通过为 label 设置 .sr-only 类将其隐藏。还有一些辅助技术提供label标签的替代方案，比如 aria-label、aria-labelledby 或 title 属性。如果这些都不存在，屏幕阅读器可能会采取使用 placeholder 属性，如果存在的话，使用占位符来替代其他的标记，但要注意，这种方法是不妥当的。
+-->
+<!--注意label中的for 与 input中的保持一致-->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+
+            <form id="queryForm" role="form" class="form-inline" novalidate>
+                <div class="form-group mb-2 mr-5">
+                    <label for="code" class="justify-content-end mr-2 w-100px">路由id:</label>
+                    <input type="text" class="form-control" name="routeId" id="routeId"/>
+                </div>
+                <div class="form-group mb-2 mr-5">
+                    <label for="enabled" class="justify-content-end mr-2 w-100px">是否启用:</label>
+                    <select id="enabled" name="enabled" class="form-control w-200px"></select>
+                    <#bcomboProvider _id="enabled" _provider="enabledProvider" _value="" _onLoadSuccess=""/>
+                </div>
+                <div class="btn-group mb-2">
+                    <button id="query" type="button" class="btn btn-success mr-1" onclick="queryDataHandler()"><i class="fa fa-search"></i> 查询</button>
+                    <button id="clear" type="button" class="btn btn-danger" onclick="javascript:$('#queryForm')[0].reset();"><i class="fa fa-trash-o"></i> 清除</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="toolbar" class="btn-group" role="group" aria-label="Toolbar with button groups">
+                <button id="btn_add" type="button" class="btn btn-primary" onclick="openInsertHandler()"><i class="fa fa-plus"></i> 新增</button>
+                <button id="btn_edit" type="button" class="btn btn-primary" onclick="openUpdateHandler()"><i class="fa fa-pencil-square-o"></i> 修改</button>
+                <button id="btn_enable" type="button" class="btn btn-primary" onclick="doEnableHandler(true)"><i class="fa fa-play"></i> 启用</button>
+                <button id="btn_disabled" type="button" class="btn btn-primary" onclick="doEnableHandler(false)"><i class="fa fa-stop"></i> 禁用</button>
+            </div>
+            <table id="grid" data-toggle="table" data-title="客户列表" class="table" data-toolbar="#toolbar" data-pagination="true" data-page-number="1" data-page-size="10"
+                   data-query-params="queryParams" data-side-pagination="server" data-method="POST" data-content-type="application/x-www-form-urlencoded" data-single-select="true"
+                   data-click-to-select="true"  data-checkbox-header="true" data-unique-id="id" data-sort-name="id" data-sort-order="desc"  data-icons="bui.variable.icons" data-buttons-class="primary"
+                   data-show-refresh="true" data-show-fullscreen="true" data-show-columns="true" data-id-field="id" data-tree-show-field="code" data-parent-id-field="pid"
+            >
+                <thead>
+                <tr>
+                    <th data-width-unit="%" data-width="2" data-checkbox="true"></th>
+                    <th data-width-unit="%" data-width="7" data-field="routeId" data-sortable="true" data-align="center">
+                        路由id
+                    </th>
+                    <th data-width-unit="%" data-width="10" data-field="routeUri" data-sortable="true" data-align="center">
+                        路由uri
+                    </th>
+                    <th data-width-unit="%" data-width="7" data-field="routeOrder" data-sortable="true" data-align="center">
+                        顺序
+                    </th>
+                    <th data-width-unit="%" data-width="7" data-field="enabled" data-sortable="true" data-align="center" data-provider="enabledProvider">
+                        是否可用
+                    </th>
+                    <th data-width-unit="%" data-width="20" data-field="predicates" data-sortable="true" data-align="center">
+                        断言
+                    </th>
+                    <th data-width-unit="%" data-width="20" data-field="filters" data-sortable="true" data-align="center" >
+                        过滤器
+                    </th>
+                    <th data-width-unit="%" data-width="7" data-field="version" data-sortable="true" data-align="center">
+                        版本号
+                    </th>
+                    <th data-width-unit="%" data-width="10" data-field="createTime" data-sortable="true" data-align="center" data-provider="datetimeProvider">
+                        创建时间
+                    </th>
+                    <th data-width-unit="%" data-width="10" data-field="updateTime" data-sortable="true" data-align="center" data-provider="datetimeProvider">
+                        修改时间
+                    </th>
+
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="_modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!--modal-lg modal-sm(默认) 通过设置mw大小调整宽度（如mw-100） modal-dialog-centered垂直居中-->
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!-- 标题 -->
+                <h5 class="modal-title" id="exampleModalLabel">路由新增</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="_form" method="post" class="form-horizontal" action="">
+                    <input name="_id" id="_id" type="hidden">
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label text-right" for="_routeId">路由id</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" id="_routeId" name="_routeId" placeholder="如：customer-service" required/>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label text-right" for="_routeUri">路由uri</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" id="_routeUri" name="_routeUri" placeholder="如：lb://customer-service" required/>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label text-right" for="_routeOrder">顺序</label>
+                        <div class="col-10">
+                            <input type="text" class="form-control" id="_routeOrder" name="_routeOrder" placeholder="如：1" required/>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label text-right">是否可用</label>
+                        <div class="col-10 pt-2" id="_enabled">
+                            <#bradioGroupProvider _containerId="_state" _name="_state" _provider="enabledStateProvider" _required="true"/>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label text-right" for="_predicates">断言</label>
+                        <div class="col-10">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <label for="_predicates"  class="input-group-text fa fa-calendar"></label>
+                                </div>
+                                <input type="text" name="_predicates" id="_predicates" class="form-control date" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label text-right" for="_filters">过滤器</label>
+                        <div class="col-10">
+                            <input type="text" name="_filters" id="_filters" class="form-control date" required/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="bui.util.debounce(saveOrUpdateHandler,1000,true)()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</#bs4Body>
+<#route_js />

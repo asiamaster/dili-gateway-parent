@@ -1,25 +1,54 @@
 package com.dili.dr.rpc;
 
+import com.dili.dr.domain.GatewayRouteDefinition;
 import com.dili.dr.domain.GatewayRoutes;
 import com.dili.ss.domain.BaseOutput;
-import com.dili.ss.retrofitful.annotation.POST;
-import com.dili.ss.retrofitful.annotation.ReqParam;
-import com.dili.ss.retrofitful.annotation.Restful;
-import com.dili.ss.retrofitful.annotation.VOBody;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Restful("${gateway.contextPath}")
+/**
+ * 网关路由远程服务
+ */
+//@Restful("${gateway.contextPath}")
+@FeignClient(name = "gateway-service")
 public interface DynamicRouteRpc {
-    @POST("/api/route/add")
-    BaseOutput<String> add(@VOBody GatewayRoutes gatewayRoutes);
+    /**
+     * 新增路由
+     * @param gatewayRouteDefinition
+     * @return
+     */
+//    @POST("/api/route/add")
+    @RequestMapping(value = "/api/route/add", method = RequestMethod.POST)
+    BaseOutput<String> add(@RequestBody GatewayRouteDefinition gatewayRouteDefinition);
 
-    @POST("/api/route/update")
-    BaseOutput<String> update(@VOBody GatewayRoutes gatewayRoutes);
+    /**
+     * 修改路由
+     * @param gatewayRouteDefinition
+     * @return
+     */
+//    @POST("/api/route/update")
+    @RequestMapping(value = "/api/route/update", method = RequestMethod.POST)
+    BaseOutput<String> update(@RequestBody GatewayRouteDefinition gatewayRouteDefinition);
 
-    @POST("/api/route/del")
-    BaseOutput<String> del(@ReqParam("id") String id);
+    /**
+     * 根据routeId删除路由
+     * @param id
+     * @return
+     */
+//    @POST("/api/route/del")
+//    @RequestMapping(value = "/api/route/del", method = RequestMethod.DELETE)
+    @DeleteMapping("/api/route/del/{routeId}")
+//    BaseOutput<String> del(@RequestParam("id") String id);
+    BaseOutput<String> del(@PathVariable("routeId") String routeId);
 
-    @POST("/api/route/load")
-    BaseOutput<String> load(@VOBody List<GatewayRoutes> gatewayRoutes);
+    /**
+     * 加载路由
+     * @param gatewayRoutes
+     * @return
+     */
+//    @POST("/api/route/load")
+    @RequestMapping(value = "/api/route/load", method = RequestMethod.POST)
+    BaseOutput<String> load(@RequestBody List<GatewayRoutes> gatewayRoutes);
 }

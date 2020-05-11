@@ -2,6 +2,7 @@ package com.dili.dr.service;
 
 import com.dili.dr.domain.GatewayRoutes;
 import com.dili.ss.base.BaseService;
+import com.dili.ss.domain.BaseOutput;
 
 /**
  * 网关路由服务
@@ -31,4 +32,12 @@ public interface GatewayRoutesService extends BaseService<GatewayRoutes, Long> {
      * @return
      */
     int delete(String routeId);
+
+    /**
+     * 启/禁用
+     * @param id
+     * @param enable
+     * @return
+     */
+    BaseOutput updateEnable(Long id, Boolean enable);
 }

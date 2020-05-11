@@ -3,7 +3,7 @@
     <!--<include resource="org/springframework/boot/logging/logback/base.xml"/>-->
 
     <!-- 文件输出格式 -->
-    <property name="PATTERN" value="[gateway-dev]%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
+    <property name="PATTERN" value="[dr-dev]%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
 
     <!-- 开发环境 -->
     <springProfile name="dev">
@@ -21,7 +21,7 @@
     <springProfile name="test">
         <appender name="appender" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
-                <pattern>[gateway-test]%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n</pattern>
+                <pattern>[dr-test]%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n</pattern>
             </encoder>
         </appender>
         <!-- 每天产生一个文件 -->

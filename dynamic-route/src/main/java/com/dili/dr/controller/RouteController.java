@@ -4,14 +4,13 @@ import com.dili.dr.domain.GatewayRoutes;
 import com.dili.dr.service.GatewayRoutesService;
 import com.dili.ss.domain.BaseOutput;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 路由控制器
  */
-@RestController
+@Controller
 @RequestMapping("/route")
 public class RouteController {
 
@@ -20,6 +19,7 @@ public class RouteController {
 
     /**
      * 路由管理页
+     * http://localhost:8081/route/index.html
      * @return
      */
     @GetMapping("/index.html")
@@ -30,10 +30,11 @@ public class RouteController {
      * 查询路由
      * @return
      */
-    @GetMapping("/listPage")
-    public List<GatewayRoutes> listPage(GatewayRoutes gatewayRoutes) {
+    @PostMapping("/listPage.action")
+    @ResponseBody
+    public String listPage(GatewayRoutes gatewayRoutes) throws Exception {
 //        dynamicRouteService.listAll();
-        return gatewayRoutesService.listByExample(gatewayRoutes);
+        return gatewayRoutesService.listEasyuiPageByExample(gatewayRoutes, true).toString();
     }
 
     /**
@@ -41,7 +42,7 @@ public class RouteController {
      * @param gatewayRoutes
      * @return
      */
-    @PostMapping("/add")
+    @PostMapping("/add.action")
     public BaseOutput<String> add(@RequestBody GatewayRoutes gatewayRoutes) {
         this.gatewayRoutesService.insertSelective(gatewayRoutes);
         return BaseOutput.success("新增成功");
@@ -52,8 +53,8 @@ public class RouteController {
      * @param routeId
      * @return
      */
-    @DeleteMapping("/del/{routeId}")
-    public BaseOutput<String> delete(@PathVariable String routeId) {
+    @PostMapping("/del.action")
+    public BaseOutput<String> delete(@RequestParam("routeId") String routeId) {
         gatewayRoutesService.delete(routeId);
         return BaseOutput.success("删除成功");
     }
@@ -63,10 +64,22 @@ public class RouteController {
      * @param gatewayRoutes
      * @return
      */
-    @PostMapping("/update")
+    @PostMapping("/update.action")
     public BaseOutput<String> update(@RequestBody GatewayRoutes gatewayRoutes) {
         this.gatewayRoutesService.updateSelective(gatewayRoutes);
         return BaseOutput.success("修改成功");
     }
+
+    /**
+     * 更新路由
+     * @param id
+     * @return
+     */
+    @PostMapping("/doEnable.action")
+    public BaseOutput<String> doEnable(Long id, Boolean enable) {
+        this.gatewayRoutesService.updateEnable(id, enable);
+        return BaseOutput.success("修改成功");
+    }
+
 
 }
