@@ -7,7 +7,6 @@ import java.util.List;
  * 路由模型
  * @author wangmi
  */
-
 public class GatewayRouteDefinition {
 
     //路由的Id

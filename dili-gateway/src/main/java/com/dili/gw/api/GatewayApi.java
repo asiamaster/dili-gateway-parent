@@ -66,13 +66,13 @@ public class GatewayApi {
 
     /**
      * 更新路由
-     * @param gatewayRoutes
+     * @param gatewayRouteDefinition
      * @return
      */
     @PostMapping("/update")
-    public BaseOutput<String> update(@RequestBody GatewayRoutes gatewayRoutes) {
+    public BaseOutput<String> update(@RequestBody GatewayRouteDefinition gatewayRouteDefinition) {
         try {
-            this.dynamicRouteService.update(RouteDefinitionUtils.assembleRouteDefinition(gatewayRoutes));
+            this.dynamicRouteService.update(RouteDefinitionUtils.assembleRouteDefinition(gatewayRouteDefinition));
             return BaseOutput.success();
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,7 +85,7 @@ public class GatewayApi {
      * @param id
      * @return
      */
-    @DeleteMapping("/routes/{id}")
+    @DeleteMapping("/del/{id}")
     public BaseOutput<String> delete(@PathVariable String id) {
         try {
             this.dynamicRouteService.delete(id);

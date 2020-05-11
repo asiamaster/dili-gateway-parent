@@ -6,9 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
-import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.ResponseEntity;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,12 +18,16 @@ import java.util.List;
  * 动态路由服务
  */
 @Service
-public class DynamicRouteService {
+public class DynamicRouteService implements ApplicationEventPublisherAware {
 
     @Autowired
     private RouteDefinitionRepository routeDefinitionWriter;
-    @Autowired
     private ApplicationEventPublisher publisher;
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.publisher = applicationEventPublisher;
+    }
 
     /**
      * 加载路由信息
@@ -91,17 +94,16 @@ public class DynamicRouteService {
      * @param id
      * @return
      */
-    public Mono<ResponseEntity<Object>> delete(String id) {
-        return this.routeDefinitionWriter.delete(Mono.just(id)).then(Mono.defer(() -> {
-            return Mono.just(ResponseEntity.ok().build());
-        })).onErrorResume((t) -> {//predicate
-            return t instanceof NotFoundException;
-        }, (t) -> {//fallback
-            return Mono.just(ResponseEntity.notFound().build());
-        });
-
-//        this.routeDefinitionWriter.delete(Mono.just(id)).subscribe();
-//        notifyChanged();
+    public void delete(String id) {
+//        return this.routeDefinitionWriter.delete(Mono.just(id)).then(Mono.defer(() -> {
+//            return Mono.just(ResponseEntity.ok().build());
+//        })).onErrorResume((t) -> {//predicate
+//            return t instanceof NotFoundException;
+//        }, (t) -> {//fallback
+//            return Mono.just(ResponseEntity.notFound().build());
+//        });
+        this.routeDefinitionWriter.delete(Mono.just(id)).subscribe();
+        notifyChanged();
     }
 
     /**

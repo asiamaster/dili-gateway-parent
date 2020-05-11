@@ -4,45 +4,30 @@ import com.alibaba.fastjson.JSON;
 import com.dili.ss.domain.BaseDomain;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-@Table(name = "`gateway_routes`")
 public class GatewayRoutes extends BaseDomain {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "`id`")
     private Long id;
 
-    @Column(name = "`route_id`")
     private String routeId;
 
-    @Column(name = "`route_uri`")
     private String routeUri;
 
-    @Column(name = "`route_order`")
     private Integer routeOrder;
 
-    @Column(name = "`enabled`")
     private Boolean enabled;
 
-    @Column(name = "`deleted`")
     private Boolean deleted;
 
-    @Column(name = "`create_time`")
     private Date createTime;
 
-    @Column(name = "`update_time`")
     private Date updateTime;
 
-    @Column(name = "`predicates`")
     private String predicates;
 
-    @Column(name = "`filters`")
     private String filters;
 
-    @Column(name = "`version`")
     private String version;
 
     /**

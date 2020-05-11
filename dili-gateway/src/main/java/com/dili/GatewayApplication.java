@@ -9,17 +9,15 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
-import tk.mybatis.spring.annotation.MapperScan;
 
 /**
  * 由MyBatis Generator工具自动生成
  */
 @SpringBootApplication
 @ComponentScan(basePackages={"com.dili.ss", "com.dili.gw"})
-@MapperScan(basePackages = {"com.dili.gateway.mapper", "com.dili.ss.dao"})
 @EnableDiscoveryClient
 //@EnableFeignClients
-public class Application {
+public class GatewayApplication {
 
     @LoadBalanced
     @Bean
@@ -41,7 +39,7 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(GatewayApplication.class, args);
     }
 
 
