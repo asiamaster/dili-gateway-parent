@@ -2,6 +2,7 @@ package com.dili.dr.domain;
 
 import com.alibaba.fastjson.JSON;
 import com.dili.ss.domain.BaseDomain;
+import com.dili.ss.domain.annotation.Like;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ public class GatewayRoutes extends BaseDomain {
     @Column(name = "`route_id`")
     private String routeId;
 
+    @Like
     @Column(name = "`route_uri`")
     private String routeUri;
 
@@ -26,9 +28,6 @@ public class GatewayRoutes extends BaseDomain {
 
     @Column(name = "`enabled`")
     private Boolean enabled;
-
-    @Column(name = "`deleted`")
-    private Boolean deleted;
 
     @Column(name = "`create_time`")
     private Date createTime;
@@ -141,14 +140,6 @@ public class GatewayRoutes extends BaseDomain {
         this.enabled = enabled;
     }
 
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
-
     public String getVersion() {
         return version;
     }
@@ -165,7 +156,6 @@ public class GatewayRoutes extends BaseDomain {
                 ", routeUri='" + routeUri + '\'' +
                 ", routeOrder=" + routeOrder +
                 ", isEbl=" + enabled +
-                ", isDel=" + deleted +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 ", predicates='" + predicates + '\'' +

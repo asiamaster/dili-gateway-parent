@@ -37,10 +37,14 @@ public class EnabledProvider implements ValueProvider {
         if (null == object) {
             return null;
         }
-        ValuePair<?> valuePair = BUFFER.stream().filter(val -> object.toString().equals(val.getValue())).findFirst().orElseGet(null);
+        Boolean value =(Boolean) object;
+        ValuePair<?> valuePair = BUFFER.stream().filter(val ->
+                object.toString().equals(val.getValue())
+        ).findFirst().orElseGet(() -> null);
         if (null != valuePair) {
             return valuePair.getText();
         }
-        return null;
+        return "";
+//        return value ? EnabledEnum.ENABLED.getName() : EnabledEnum.DISABLED.getName();
     }
 }

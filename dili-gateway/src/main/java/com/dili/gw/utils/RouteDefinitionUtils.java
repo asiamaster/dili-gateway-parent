@@ -77,7 +77,7 @@ public class RouteDefinitionUtils {
 
         //设置断言
         List<PredicateDefinition> pdList=new ArrayList<>();
-        List<GatewayPredicateDefinition> gatewayPredicateDefinitionList=gwDefinition.getPredicates();
+        List<GatewayPredicateDefinition> gatewayPredicateDefinitionList = gwDefinition.getPredicates();
         for (GatewayPredicateDefinition gpDefinition: gatewayPredicateDefinitionList) {
             PredicateDefinition predicate = new PredicateDefinition();
             predicate.setArgs(gpDefinition.getArgs());
@@ -89,11 +89,13 @@ public class RouteDefinitionUtils {
         //设置过滤器
         List<FilterDefinition> filters = new ArrayList();
         List<GatewayFilterDefinition> gatewayFilters = gwDefinition.getFilters();
-        for(GatewayFilterDefinition filterDefinition : gatewayFilters){
-            FilterDefinition filter = new FilterDefinition();
-            filter.setName(filterDefinition.getName());
-            filter.setArgs(filterDefinition.getArgs());
-            filters.add(filter);
+        if(gatewayFilters != null) {
+            for (GatewayFilterDefinition filterDefinition : gatewayFilters) {
+                FilterDefinition filter = new FilterDefinition();
+                filter.setName(filterDefinition.getName());
+                filter.setArgs(filterDefinition.getArgs());
+                filters.add(filter);
+            }
         }
         definition.setFilters(filters);
 

@@ -3,6 +3,15 @@
     .w-200px{width: 200px!important;}
     .w-100px{width: 100px!important;}
 </style>
+<script>
+    function dataFormatterTip(value,row,index) {
+        if (value) {
+            return '<span data-toggle="tooltip" data-placement="left" title=\'' + value + '\'>' + value + '</span>';
+        } else {
+            return "";
+        }
+    }
+</script>
 <!--
  内联元素:让元素排成一行显示出来，且高度和宽度由内容决定，不能用css控制
  块状元素:独立占一行
@@ -15,11 +24,11 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-
+            <#bs4nav/>
             <form id="queryForm" role="form" class="form-inline" novalidate>
                 <div class="form-group mb-2 mr-5">
-                    <label for="code" class="justify-content-end mr-2 w-100px">路由id:</label>
-                    <input type="text" class="form-control" name="routeId" id="routeId"/>
+                    <label for="routeId" class="justify-content-end mr-2 w-100px">路由id:</label>
+                    <input type="text" class="form-control" name="routeId" id="routeId" />
                 </div>
                 <div class="form-group mb-2 mr-5">
                     <label for="enabled" class="justify-content-end mr-2 w-100px">是否启用:</label>
@@ -40,6 +49,7 @@
                 <button id="btn_edit" type="button" class="btn btn-primary" onclick="openUpdateHandler()"><i class="fa fa-pencil-square-o"></i> 修改</button>
                 <button id="btn_enable" type="button" class="btn btn-primary" onclick="doEnableHandler(true)"><i class="fa fa-play"></i> 启用</button>
                 <button id="btn_disabled" type="button" class="btn btn-primary" onclick="doEnableHandler(false)"><i class="fa fa-stop"></i> 禁用</button>
+                <button id="btn_del" type="button" class="btn btn-primary" onclick="doDeleteHandler(false)"><i class="fa fa-remove"></i> 删除</button>
             </div>
             <table id="grid" data-toggle="table" data-title="客户列表" class="table" data-toolbar="#toolbar" data-pagination="true" data-page-number="1" data-page-size="10"
                    data-query-params="queryParams" data-side-pagination="server" data-method="POST" data-content-type="application/x-www-form-urlencoded" data-single-select="true"
@@ -52,22 +62,22 @@
                     <th data-width-unit="%" data-width="7" data-field="routeId" data-sortable="true" data-align="center">
                         路由id
                     </th>
-                    <th data-width-unit="%" data-width="10" data-field="routeUri" data-sortable="true" data-align="center">
+                    <th data-width-unit="%" data-width="12" data-field="routeUri" data-sortable="true" data-align="center">
                         路由uri
                     </th>
-                    <th data-width-unit="%" data-width="7" data-field="routeOrder" data-sortable="true" data-align="center">
+                    <th data-width-unit="%" data-width="5" data-field="routeOrder" data-sortable="true" data-align="center">
                         顺序
                     </th>
-                    <th data-width-unit="%" data-width="7" data-field="enabled" data-sortable="true" data-align="center" data-provider="enabledProvider">
+                    <th data-width-unit="%" data-width="6" data-field="enabled" data-sortable="true" data-align="center" data-provider="enabledProvider">
                         是否可用
                     </th>
-                    <th data-width-unit="%" data-width="20" data-field="predicates" data-sortable="true" data-align="center">
+                    <th data-width-unit="%" data-width="21" data-field="predicates" data-sortable="true" data-formatter="dataFormatterTip" data-align="center">
                         断言
                     </th>
-                    <th data-width-unit="%" data-width="20" data-field="filters" data-sortable="true" data-align="center" >
+                    <th data-width-unit="%" data-width="21" data-field="filters" data-sortable="true" data-formatter="dataFormatterTip" data-align="center" >
                         过滤器
                     </th>
-                    <th data-width-unit="%" data-width="7" data-field="version" data-sortable="true" data-align="center">
+                    <th data-width-unit="%" data-width="5" data-field="version" data-sortable="true" data-align="center">
                         版本号
                     </th>
                     <th data-width-unit="%" data-width="10" data-field="createTime" data-sortable="true" data-align="center" data-provider="datetimeProvider">
@@ -76,7 +86,6 @@
                     <th data-width-unit="%" data-width="10" data-field="updateTime" data-sortable="true" data-align="center" data-provider="datetimeProvider">
                         修改时间
                     </th>
-
                 </tr>
                 </thead>
             </table>
@@ -120,24 +129,19 @@
                     <div class="form-group row">
                         <label class="col-2 col-form-label text-right">是否可用</label>
                         <div class="col-10 pt-2" id="_enabled">
-                            <#bradioGroupProvider _containerId="_state" _name="_state" _provider="enabledStateProvider" _required="true"/>
+                            <#bradioGroupProvider _containerId="_enabled" _name="_enabled" _provider="enabledProvider" _required="true" _value="false"/>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-2 col-form-label text-right" for="_predicates">断言</label>
                         <div class="col-10">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <label for="_predicates"  class="input-group-text fa fa-calendar"></label>
-                                </div>
-                                <input type="text" name="_predicates" id="_predicates" class="form-control date" required/>
-                            </div>
+                            <textarea class="form-control " style="height:200px;" aria-label="With textarea" id="_predicates" name="_predicates" required></textarea>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-2 col-form-label text-right" for="_filters">过滤器</label>
                         <div class="col-10">
-                            <input type="text" name="_filters" id="_filters" class="form-control date" required/>
+                            <textarea class="form-control " style="height:200px;"  aria-label="With textarea" id="_filters" name="_filters" ></textarea>
                         </div>
                     </div>
                 </form>

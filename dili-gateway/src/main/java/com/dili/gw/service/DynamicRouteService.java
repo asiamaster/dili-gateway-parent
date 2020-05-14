@@ -2,6 +2,8 @@ package com.dili.gw.service;
 
 import com.dili.gw.domain.GatewayRoutes;
 import com.dili.gw.utils.RouteDefinitionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
@@ -23,6 +25,8 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
     @Autowired
     private RouteDefinitionRepository routeDefinitionWriter;
     private ApplicationEventPublisher publisher;
+
+    protected static final Logger log = LoggerFactory.getLogger(DynamicRouteService.class);
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
@@ -64,26 +68,31 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
      * @return
      */
     public String add(RouteDefinition definition) {
-        routeDefinitionWriter.save(Mono.just(definition)).subscribe();
-        notifyChanged();
-        return "success";
+        try {
+            routeDefinitionWriter.save(Mono.just(definition)).subscribe();
+            notifyChanged();
+            return null;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     /**
      * 更新路由
      * @param definition
-     * @return
+     * @return error msg
      */
     public String update(RouteDefinition definition) {
         try {
             delete(definition.getId());
         } catch (Exception e) {
-            return "update fail,not find route  routeId: "+definition.getId();
+            log.warn("update warn, not find route  routeId: "+definition.getId());
+//            return "update fail,not find route  routeId: "+definition.getId();
         }
         try {
             routeDefinitionWriter.save(Mono.just(definition)).subscribe();
             notifyChanged();
-            return "success";
+            return null;
         } catch (Exception e) {
             return "update route  fail";
         }
@@ -94,7 +103,7 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
      * @param id
      * @return
      */
-    public void delete(String id) {
+    public String delete(String id) {
 //        return this.routeDefinitionWriter.delete(Mono.just(id)).then(Mono.defer(() -> {
 //            return Mono.just(ResponseEntity.ok().build());
 //        })).onErrorResume((t) -> {//predicate
@@ -102,8 +111,13 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
 //        }, (t) -> {//fallback
 //            return Mono.just(ResponseEntity.notFound().build());
 //        });
-        this.routeDefinitionWriter.delete(Mono.just(id)).subscribe();
-        notifyChanged();
+        try {
+            this.routeDefinitionWriter.delete(Mono.just(id)).subscribe();
+            notifyChanged();
+            return null;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     /**

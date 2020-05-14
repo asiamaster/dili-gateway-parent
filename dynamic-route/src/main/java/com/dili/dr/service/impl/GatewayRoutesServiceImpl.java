@@ -30,28 +30,25 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
 
     @Override
     @Transactional
-    public int insertSelective(GatewayRoutes gatewayRoutes) {
+    public BaseOutput<String> insertSelectiveAndRefreshRoute(GatewayRoutes gatewayRoutes) {
         int count = super.insertSelective(gatewayRoutes);
-        dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
-        return count;
+        return dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
     }
 
     @Override
     @Transactional
-    public int updateSelective(GatewayRoutes gatewayRoutes) {
+    public BaseOutput<String> updateSelectiveAndRefreshRoute(GatewayRoutes gatewayRoutes) {
         int count = super.updateSelective(gatewayRoutes);
-        dynamicRouteRpc.update(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
-        return count;
+        return dynamicRouteRpc.update(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
     }
 
     @Override
     @Transactional
-    public int delete(String routeId) {
+    public BaseOutput<String> deleteAndRefreshRoute(String routeId) {
         GatewayRoutes gatewayRoutes = new GatewayRoutes();
         gatewayRoutes.setRouteId(routeId);
-        int count = super.deleteByExample(gatewayRoutes);
-        dynamicRouteRpc.del(routeId);
-        return count;
+        super.deleteByExample(gatewayRoutes);
+        return dynamicRouteRpc.del(routeId);
     }
 
     /**
@@ -70,15 +67,10 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
     }
 
     @Override
-    public BaseOutput updateEnable(Long id, Boolean enable) {
-        GatewayRoutes gatewayRoutes = new GatewayRoutes();
-        gatewayRoutes.setId(id);
-        if (enable) {
-            gatewayRoutes.setEnabled(true);
-        } else {
-            gatewayRoutes.setEnabled(false);
-        }
-        getActualDao().updateByPrimaryKeySelective(gatewayRoutes);
-        return BaseOutput.success();
+    public BaseOutput<String> updateEnableAndRefreshRoute(Long id, Boolean enable) {
+        GatewayRoutes gatewayRoutes = get(id);
+        gatewayRoutes.setEnabled(enable);
+        updateSelective(gatewayRoutes);
+        return enable ? dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes)) : dynamicRouteRpc.del(gatewayRoutes.getRouteId());
     }
 }

@@ -15,23 +15,21 @@ public interface GatewayRoutesService extends BaseService<GatewayRoutes, Long> {
      * @param gatewayRoutes
      * @return
      */
-    @Override
-    int insertSelective(GatewayRoutes gatewayRoutes);
+    BaseOutput<String> insertSelectiveAndRefreshRoute(GatewayRoutes gatewayRoutes);
 
     /**
      * 更新路由，并更新缓存
      * @param gatewayRoutes
      * @return
      */
-    @Override
-    int updateSelective(GatewayRoutes gatewayRoutes);
+    BaseOutput<String> updateSelectiveAndRefreshRoute(GatewayRoutes gatewayRoutes);
 
     /**
      * 根据路由id删除
      * @param routeId
      * @return
      */
-    int delete(String routeId);
+    BaseOutput<String> deleteAndRefreshRoute(String routeId);
 
     /**
      * 启/禁用
@@ -39,5 +37,5 @@ public interface GatewayRoutesService extends BaseService<GatewayRoutes, Long> {
      * @param enable
      * @return
      */
-    BaseOutput updateEnable(Long id, Boolean enable);
+    BaseOutput<String> updateEnableAndRefreshRoute(Long id, Boolean enable);
 }

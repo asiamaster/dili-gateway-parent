@@ -43,7 +43,8 @@ public class RouteController {
      * @return
      */
     @PostMapping("/add.action")
-    public BaseOutput<String> add(@RequestBody GatewayRoutes gatewayRoutes) {
+    @ResponseBody
+    public BaseOutput<String> add(@ModelAttribute GatewayRoutes gatewayRoutes) {
         this.gatewayRoutesService.insertSelective(gatewayRoutes);
         return BaseOutput.success("新增成功");
     }
@@ -54,8 +55,9 @@ public class RouteController {
      * @return
      */
     @PostMapping("/del.action")
+    @ResponseBody
     public BaseOutput<String> delete(@RequestParam("routeId") String routeId) {
-        gatewayRoutesService.delete(routeId);
+        gatewayRoutesService.deleteAndRefreshRoute(routeId);
         return BaseOutput.success("删除成功");
     }
 
@@ -65,8 +67,9 @@ public class RouteController {
      * @return
      */
     @PostMapping("/update.action")
-    public BaseOutput<String> update(@RequestBody GatewayRoutes gatewayRoutes) {
-        this.gatewayRoutesService.updateSelective(gatewayRoutes);
+    @ResponseBody
+    public BaseOutput<String> update(GatewayRoutes gatewayRoutes) {
+        this.gatewayRoutesService.updateSelectiveAndRefreshRoute(gatewayRoutes);
         return BaseOutput.success("修改成功");
     }
 
@@ -76,10 +79,10 @@ public class RouteController {
      * @return
      */
     @PostMapping("/doEnable.action")
+    @ResponseBody
     public BaseOutput<String> doEnable(Long id, Boolean enable) {
-        this.gatewayRoutesService.updateEnable(id, enable);
+        this.gatewayRoutesService.updateEnableAndRefreshRoute(id, enable);
         return BaseOutput.success("修改成功");
     }
-
 
 }

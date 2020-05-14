@@ -56,10 +56,9 @@ public class GatewayApi {
     @PostMapping("/add")
     public BaseOutput<String> add(@RequestBody GatewayRouteDefinition gatewayRouteDefinition) {
         try {
-            this.dynamicRouteService.add(RouteDefinitionUtils.assembleRouteDefinition(gatewayRouteDefinition));
-            return BaseOutput.success();
+            String errorMsg = this.dynamicRouteService.add(RouteDefinitionUtils.assembleRouteDefinition(gatewayRouteDefinition));
+            return errorMsg == null ? BaseOutput.success() : BaseOutput.failure(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
             return BaseOutput.failure(e.getMessage());
         }
     }
@@ -72,10 +71,9 @@ public class GatewayApi {
     @PostMapping("/update")
     public BaseOutput<String> update(@RequestBody GatewayRouteDefinition gatewayRouteDefinition) {
         try {
-            this.dynamicRouteService.update(RouteDefinitionUtils.assembleRouteDefinition(gatewayRouteDefinition));
-            return BaseOutput.success();
+            String errorMsg = this.dynamicRouteService.update(RouteDefinitionUtils.assembleRouteDefinition(gatewayRouteDefinition));
+            return errorMsg == null ? BaseOutput.success() : BaseOutput.failure(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
             return BaseOutput.failure(e.getMessage());
         }
     }
@@ -87,13 +85,8 @@ public class GatewayApi {
      */
     @DeleteMapping("/del/{id}")
     public BaseOutput<String> delete(@PathVariable String id) {
-        try {
-            this.dynamicRouteService.delete(id);
-            return BaseOutput.success();
-        }catch (Exception e){
-            e.printStackTrace();
-            return BaseOutput.failure(e.getMessage());
-        }
+        String errorMsg = this.dynamicRouteService.delete(id);
+        return errorMsg == null ? BaseOutput.success() : BaseOutput.failure(errorMsg);
     }
 
 }

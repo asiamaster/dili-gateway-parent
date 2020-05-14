@@ -1,5 +1,6 @@
 package com.dili;
 
+import com.dili.ss.retrofitful.annotation.RestfulScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -14,8 +15,9 @@ import tk.mybatis.spring.annotation.MapperScan;
  * 由MyBatis Generator工具自动生成
  */
 @SpringBootApplication
-@ComponentScan(basePackages={"com.dili.ss", "com.dili.dr"})
+@ComponentScan(basePackages={"com.dili.ss", "com.dili.dr", "com.dili.uap.sdk"})
 @MapperScan(basePackages = {"com.dili.dr.mapper", "com.dili.ss.dao"})
+@RestfulScan({"com.dili.uap.sdk.rpc"})
 @EnableDiscoveryClient
 @EnableFeignClients
 public class RouteApplication {
