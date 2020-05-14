@@ -45,6 +45,8 @@
         _modal.find('.modal-title').text('修改路由');
         //修改时禁用启用状态
         $("[name='_enabled']").attr("disabled", true);
+        //不允许修改路由id
+        $("#_routeId").attr("readonly", true);
         let formData = $.extend({}, row);
         formData = bui.util.addKeyStartWith(bui.util.getOriginalData(formData), "_");
         //由于数据库中的原始值是bool类型，而表单控件中只支持字符串
@@ -259,10 +261,12 @@
         }
     });
 
+    //双击事件
     _grid.on('dbl-click-row.bs.table', function (e, row, $element, field) {
         openUpdateHandler(row);
     });
 
+    //加载完成后绑定tooltip
     _grid.on('load-success.bs.table', function (e, data) {
         $('[data-toggle="tooltip"]').tooltip();
     });
