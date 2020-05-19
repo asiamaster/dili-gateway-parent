@@ -19,16 +19,12 @@ import java.util.stream.Stream;
 @Component
 public class EnabledProvider implements ValueProvider {
 
-    private static final List<ValuePair<?>> BUFFER = new ArrayList<>();
-
-    static {
+    @Override
+    public List<ValuePair<?>> getLookupList(Object o, Map map, FieldMeta fieldMeta) {
+        List<ValuePair<?>> BUFFER = new ArrayList<>();
         BUFFER.addAll(Stream.of(EnabledEnum.values())
                 .map(e -> new ValuePairImpl<>(e.getName(), e.getCode().toString()))
                 .collect(Collectors.toList()));
-    }
-
-    @Override
-    public List<ValuePair<?>> getLookupList(Object o, Map map, FieldMeta fieldMeta) {
         return BUFFER;
     }
 
@@ -37,7 +33,10 @@ public class EnabledProvider implements ValueProvider {
         if (null == object) {
             return null;
         }
-        Boolean value =(Boolean) object;
+        List<ValuePair<?>> BUFFER = new ArrayList<>();
+        BUFFER.addAll(Stream.of(EnabledEnum.values())
+                .map(e -> new ValuePairImpl<>(e.getName(), e.getCode().toString()))
+                .collect(Collectors.toList()));
         ValuePair<?> valuePair = BUFFER.stream().filter(val ->
                 object.toString().equals(val.getValue())
         ).findFirst().orElseGet(() -> null);
