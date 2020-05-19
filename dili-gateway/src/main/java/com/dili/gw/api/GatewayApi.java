@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class GatewayApi {
      */
     @GetMapping("/listAll")
     public Flux<RouteDefinition> listAll() {
-        return dynamicRouteService.listAll();
+        return dynamicRouteService.listAll().publishOn(Schedulers.elastic());
     }
 
     /**
