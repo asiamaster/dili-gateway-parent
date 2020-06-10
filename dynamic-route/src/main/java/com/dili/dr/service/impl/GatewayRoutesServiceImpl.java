@@ -23,6 +23,7 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
         return (GatewayRoutesMapper)getDao();
     }
 
+    @Override
     @PostConstruct
     public void init() {
         dynamicRouteRpc.load(list(null));

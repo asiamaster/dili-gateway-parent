@@ -33,17 +33,18 @@ public class EnabledProvider implements ValueProvider {
         if (null == object) {
             return null;
         }
-        List<ValuePair<?>> BUFFER = new ArrayList<>();
-        BUFFER.addAll(Stream.of(EnabledEnum.values())
-                .map(e -> new ValuePairImpl<>(e.getName(), e.getCode().toString()))
-                .collect(Collectors.toList()));
-        ValuePair<?> valuePair = BUFFER.stream().filter(val ->
-                object.toString().equals(val.getValue())
-        ).findFirst().orElseGet(() -> null);
-        if (null != valuePair) {
-            return valuePair.getText();
-        }
-        return "";
-//        return value ? EnabledEnum.ENABLED.getName() : EnabledEnum.DISABLED.getName();
+        Boolean enabled = (Boolean) object;
+        return enabled ? EnabledEnum.ENABLED.getName() : EnabledEnum.DISABLED.getName();
+//        List<ValuePair<?>> BUFFER = new ArrayList<>();
+//        BUFFER.addAll(Stream.of(EnabledEnum.values())
+//                .map(e -> new ValuePairImpl<>(e.getName(), e.getCode().toString()))
+//                .collect(Collectors.toList()));
+//        ValuePair<?> valuePair = BUFFER.stream().filter(val ->
+//                object.toString().equals(val.getValue())
+//        ).findFirst().orElseGet(() -> null);
+//        if (null != valuePair) {
+//            return valuePair.getText();
+//        }
+//        return "";
     }
 }

@@ -11,6 +11,10 @@ import com.dili.ss.domain.BaseOutput;
 public interface GatewayRoutesService extends BaseService<GatewayRoutes, Long> {
 
     /**
+     * 初始化数据源
+     */
+    void init();
+    /**
      * 新增路由，并更新缓存
      * @param gatewayRoutes
      * @return
