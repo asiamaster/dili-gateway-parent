@@ -30,6 +30,7 @@
     </parent>
 
     <build>
+        <finalName>dili-gateway</finalName>
         <!-- 资源文件过滤 -->
         <resources>
             <resource>
