@@ -123,21 +123,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.dili</groupId>-->
-<!--			<artifactId>ss-beetl</artifactId>-->
-<!--			<version>${sharp-sword.version}</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.springframework.boot</groupId>-->
-<!--                    <artifactId>spring-boot-starter-web</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>com.dili</groupId>-->
-<!--                    <artifactId>ss-mvc</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--		</dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-redis</artifactId>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>com.dili</groupId>
+            <artifactId>ss-redis</artifactId>
+            <version>${sharp-sword.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.dili</groupId>
             <artifactId>ss-processor</artifactId>

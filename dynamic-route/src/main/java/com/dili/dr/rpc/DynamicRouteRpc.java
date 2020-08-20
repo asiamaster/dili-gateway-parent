@@ -12,7 +12,7 @@ import java.util.List;
  * 网关路由远程服务
  */
 //@Restful("${gateway.contextPath}")
-@FeignClient(name = "gateway-service")
+@FeignClient(name = "gateway-service", url = "${DynamicRouteRpc.url:}")
 public interface DynamicRouteRpc {
     /**
      * 新增路由
