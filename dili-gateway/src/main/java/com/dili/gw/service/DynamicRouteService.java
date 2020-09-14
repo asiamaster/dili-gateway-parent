@@ -5,15 +5,19 @@ import com.dili.gw.utils.RouteDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
+import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
+import org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -25,7 +29,8 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
     @Autowired
     private RouteDefinitionRepository routeDefinitionWriter;
     private ApplicationEventPublisher publisher;
-
+    @Autowired
+    private GatewayProperties gatewayProperties;
     protected static final Logger log = LoggerFactory.getLogger(DynamicRouteService.class);
 
     @Override
@@ -69,6 +74,10 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
      */
     public String add(RouteDefinition definition) {
         try {
+            String s = validRouteDefinition(definition);
+            if(s != null){
+                return s;
+            }
             routeDefinitionWriter.save(Mono.just(definition)).subscribe();
             notifyChanged();
             return null;
@@ -83,18 +92,42 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
      * @return error msg
      */
     public String update(RouteDefinition definition) {
+        String s = validRouteDefinition(definition);
+        if(s != null){
+            return s;
+        }
         try {
-            delete(definition.getId());
+            this.routeDefinitionWriter.delete(Mono.just(definition.getId())).subscribe();
+            notifyChanged();
         } catch (Exception e) {
             log.warn("update warn, not find route  routeId: "+definition.getId());
-//            return "update fail,not find route  routeId: "+definition.getId();
         }
         try {
             routeDefinitionWriter.save(Mono.just(definition)).subscribe();
+//            Flux<Route> routes = routeDefinitionRouteLocator.getRoutes();
+//            System.out.println(routes.collectList().block(Duration.ZERO));
             notifyChanged();
             return null;
         } catch (Exception e) {
+            e.printStackTrace();
             return "update route  fail";
+        }
+    }
+
+    /**
+     * 路由配置验证
+     * @param definition
+     * @return
+     */
+    private String validRouteDefinition(RouteDefinition definition){
+        RouteDefinitionRouteLocator routeDefinitionRouteLocator = ((AnnotationConfigReactiveWebServerApplicationContext) publisher).getBean(RouteDefinitionRouteLocator.class);
+        try {
+            Method convertToRoute = RouteDefinitionRouteLocator.class.getDeclaredMethod("convertToRoute", RouteDefinition.class);
+            convertToRoute.setAccessible(true);
+            convertToRoute.invoke(routeDefinitionRouteLocator, definition);
+            return null;
+        } catch (Exception e) {
+            return "路由定义转换异常:"+ e.getCause() == null ? e.getMessage() : e.getCause().getMessage();
         }
     }
 
@@ -121,7 +154,7 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
     }
 
     /**
-     * 通知修改
+     * 通知修改AnnotationConfigReactiveWebServerApplicationContext
      */
     private void notifyChanged() {
         this.publisher.publishEvent(new RefreshRoutesEvent(this));

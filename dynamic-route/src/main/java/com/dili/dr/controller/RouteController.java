@@ -57,8 +57,7 @@ public class RouteController {
     @PostMapping("/del.action")
     @ResponseBody
     public BaseOutput<String> delete(@RequestParam("routeId") String routeId) {
-        gatewayRoutesService.deleteAndRefreshRoute(routeId);
-        return BaseOutput.success("删除成功");
+        return gatewayRoutesService.deleteAndRefreshRoute(routeId);
     }
 
     /**
@@ -69,8 +68,7 @@ public class RouteController {
     @PostMapping("/update.action")
     @ResponseBody
     public BaseOutput<String> update(GatewayRoutes gatewayRoutes) {
-        this.gatewayRoutesService.updateSelectiveAndRefreshRoute(gatewayRoutes);
-        return BaseOutput.success("修改成功");
+        return this.gatewayRoutesService.updateSelectiveAndRefreshRoute(gatewayRoutes);
     }
 
     /**
@@ -81,8 +79,7 @@ public class RouteController {
     @PostMapping("/doEnable.action")
     @ResponseBody
     public BaseOutput<String> doEnable(Long id, Boolean enable) {
-        this.gatewayRoutesService.updateEnableAndRefreshRoute(id, enable);
-        return BaseOutput.success("修改成功");
+        return this.gatewayRoutesService.updateEnableAndRefreshRoute(id, enable);
     }
 
 }
