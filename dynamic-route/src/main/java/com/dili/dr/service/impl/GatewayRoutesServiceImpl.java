@@ -6,7 +6,9 @@ import com.dili.dr.mapper.GatewayRoutesMapper;
 import com.dili.dr.rpc.DynamicRouteRpc;
 import com.dili.dr.service.GatewayRoutesService;
 import com.dili.ss.base.BaseServiceImpl;
+import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,14 +35,22 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
     @Transactional
     public BaseOutput<String> insertSelectiveAndRefreshRoute(GatewayRoutes gatewayRoutes) {
         int count = super.insertSelective(gatewayRoutes);
-        return dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
+        BaseOutput<String> output = dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
+        if(!output.isSuccess()){
+            throw new BusinessException(ResultCode.UNSUPPORTED_MEDIA_TYPE, output.getMessage());
+        }
+        return output;
     }
 
     @Override
     @Transactional
     public BaseOutput<String> updateSelectiveAndRefreshRoute(GatewayRoutes gatewayRoutes) {
         int count = super.updateSelective(gatewayRoutes);
-        return dynamicRouteRpc.update(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
+        BaseOutput<String> output = dynamicRouteRpc.update(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
+        if(!output.isSuccess()){
+            throw new BusinessException(ResultCode.UNSUPPORTED_MEDIA_TYPE, output.getMessage());
+        }
+        return output;
     }
 
     @Override
@@ -49,7 +59,11 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
         GatewayRoutes gatewayRoutes = new GatewayRoutes();
         gatewayRoutes.setRouteId(routeId);
         super.deleteByExample(gatewayRoutes);
-        return dynamicRouteRpc.del(routeId);
+        BaseOutput<String> output = dynamicRouteRpc.del(routeId);
+        if(!output.isSuccess()){
+            throw new BusinessException(ResultCode.UNSUPPORTED_MEDIA_TYPE, output.getMessage());
+        }
+        return output;
     }
 
     /**
