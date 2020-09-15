@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
-import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
@@ -29,8 +28,7 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
     @Autowired
     private RouteDefinitionRepository routeDefinitionWriter;
     private ApplicationEventPublisher publisher;
-    @Autowired
-    private GatewayProperties gatewayProperties;
+
     protected static final Logger log = LoggerFactory.getLogger(DynamicRouteService.class);
 
     @Override
