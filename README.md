@@ -1,4 +1,5 @@
 # dili-gateway-parent
+分支: master
 # 1 网关
 ##  1.1 GIT
 网关和路由使用同一个git地址
