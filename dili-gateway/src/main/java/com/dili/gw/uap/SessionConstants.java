@@ -3,6 +3,9 @@ package com.dili.gw.uap;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+/**
+ * UAP会话常量
+ */
 @RefreshScope
 @Component
 public class SessionConstants {
