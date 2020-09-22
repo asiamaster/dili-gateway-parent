@@ -18,6 +18,7 @@
 	</parent>
 	<modules>
 		<module>dili-gateway</module>
+		<module>dynamic-route</module>
 	</modules>
 
 	<properties>
