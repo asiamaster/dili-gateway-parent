@@ -66,6 +66,15 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
         return output;
     }
 
+    @Override
+    @Transactional
+    public BaseOutput<String> updateEnableAndRefreshRoute(Long id, Boolean enable) {
+        GatewayRoutes gatewayRoutes = get(id);
+        gatewayRoutes.setEnabled(enable);
+        updateSelective(gatewayRoutes);
+        return enable ? dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes)) : dynamicRouteRpc.del(gatewayRoutes.getRouteId());
+    }
+
     /**
      * 将GatewayRoutes转换成GatewayRouteDefinition
      * @param gatewayRoutes
@@ -81,11 +90,4 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
         return gatewayRouteDefinition;
     }
 
-    @Override
-    public BaseOutput<String> updateEnableAndRefreshRoute(Long id, Boolean enable) {
-        GatewayRoutes gatewayRoutes = get(id);
-        gatewayRoutes.setEnabled(enable);
-        updateSelective(gatewayRoutes);
-        return enable ? dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes)) : dynamicRouteRpc.del(gatewayRoutes.getRouteId());
-    }
 }
