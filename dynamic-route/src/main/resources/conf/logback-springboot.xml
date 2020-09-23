@@ -17,7 +17,9 @@
         </appender>
         <logger name="org.springframework.web" level="INFO"/>
         <logger name="com.dili.dr" level="DEBUG"/>
-
+        <root level="info">
+            <appender-ref ref="appender" />
+        </root>
     </springProfile>
 
     <!-- 测试环境 -->
@@ -28,7 +30,7 @@
             </encoder>
         </appender>
         <!-- 每天产生一个文件 -->
-        <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <!-- 文件路径 -->
             <!--<file>D:/logs-test</file>-->
             <!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
@@ -44,6 +46,10 @@
         </appender>
         <logger name="org.springframework.web" level="INFO"/>
         <logger name="com.dili.dr" level="INFO"/>
+        <root level="info">
+            <appender-ref ref="appender" />
+            <appender-ref ref="FILE" />
+        </root>
     </springProfile>
 
     <!-- 生产环境 -->
@@ -72,10 +78,12 @@
         <logger name="io.seata.core.rpc.netty" level="warn"/>
         <!-- 不显示Flushing UNDO LOG  -->
         <logger name="io.seata.rm.datasource.undo" level="warn"/>
+
+        <root level="info">
+            <appender-ref ref="appender" />
+            <appender-ref ref="FILE" />
+        </root>
     </springProfile>
 
-    <root level="info">
-        <appender-ref ref="appender" />
-        <appender-ref ref="FILE" />
-    </root>
+
 </configuration>

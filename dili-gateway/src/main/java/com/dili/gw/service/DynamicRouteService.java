@@ -2,6 +2,8 @@ package com.dili.gw.service;
 
 import com.dili.gw.domain.GatewayRoutes;
 import com.dili.gw.utils.RouteDefinitionUtils;
+import com.dili.ss.exception.AppException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +43,19 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
      * @return
      */
     public void load(List<GatewayRoutes> gatewayRoutes) {
+        clear();
         gatewayRoutes.forEach(t ->{
             add(RouteDefinitionUtils.assembleRouteDefinition(t));
+            RouteDefinition routeDefinition = RouteDefinitionUtils.assembleRouteDefinition(t);
+            String s = validRouteDefinition(routeDefinition);
+            if(s != null){
+                throw new AppException("网关加载失败:"+s);
+            }
+            routeDefinitionWriter.save(Mono.just(routeDefinition)).subscribe();
         });
+        if(CollectionUtils.isNotEmpty(gatewayRoutes)) {
+            notifyChanged();
+        }
     }
 
     /**
@@ -81,6 +93,26 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
             return null;
         } catch (Exception e) {
             return e.getMessage();
+        }
+    }
+
+    /**
+     * 清空路由
+     * @return
+     */
+    public void clear() {
+        try {
+            Flux<RouteDefinition> routeDefinitions = routeDefinitionWriter.getRouteDefinitions();
+            routeDefinitions.collectList().subscribe(t -> {
+                if(!t.isEmpty()) {
+                    t.stream().forEach(item -> {
+                        delete(item.getId());
+                    });
+                    notifyChanged();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
