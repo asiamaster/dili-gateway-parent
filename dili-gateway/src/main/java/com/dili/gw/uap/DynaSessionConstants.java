@@ -17,10 +17,18 @@ public class DynaSessionConstants {
     private Long SESSION_TIMEOUT;
 
 
+    /**
+     * 获取session超时时间
+     * @return
+     */
     public Long getSessionTimeout() {
         return SESSION_TIMEOUT;
     }
 
+    /**
+     * 设置session超时时间
+     * @param sessionTimeout
+     */
     @Value("${uap.sessionTimeout:1800}")
     public void setSessionTimeout(Long sessionTimeout) {
         SESSION_TIMEOUT = sessionTimeout;
