@@ -39,13 +39,21 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
     }
 
     /**
+     * 重新加载路由信息
+     * @return
+     */
+    public void reload(List<GatewayRoutes> gatewayRoutes) {
+        clear();
+        load(gatewayRoutes);
+    }
+
+    /**
      * 加载路由信息
      * @return
      */
     public void load(List<GatewayRoutes> gatewayRoutes) {
-        clear();
         gatewayRoutes.forEach(t ->{
-            add(RouteDefinitionUtils.assembleRouteDefinition(t));
+//            add(RouteDefinitionUtils.assembleRouteDefinition(t));
             RouteDefinition routeDefinition = RouteDefinitionUtils.assembleRouteDefinition(t);
             String s = validRouteDefinition(routeDefinition);
             if(s != null){
@@ -94,6 +102,21 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    /**
+     * 批量验证路由配置
+     * @param definitions
+     * @return
+     */
+    public String validate(List<RouteDefinition> definitions) {
+        for(RouteDefinition routeDefinition : definitions) {
+            String s = validRouteDefinition(routeDefinition);
+            if (s != null) {
+                return s;
+            }
+        }
+        return null;
     }
 
     /**

@@ -138,6 +138,31 @@
         })
     }
 
+    function reloadHandler() {
+        bs4pop.confirm("确定要重新加载路由吗？", undefined, function (sure) {
+            if(sure){
+                bui.loading.show('努力提交中，请稍候。。。');
+                $.ajax({
+                    type: "GET",
+                    url: "${contextPath}/route/reload.action",
+                    dataType: "json",
+                    success : function(data) {
+                        bui.loading.hide();
+                        if(data.success){
+                            _modal.modal('hide');
+                        }else{
+                            bs4pop.alert(data.result, {type: 'error'});
+                        }
+                    },
+                    error : function() {
+                        bui.loading.hide();
+                        bs4pop.alert('远程访问失败', {type: 'error'});
+                    }
+                });
+            }
+        })
+    }
+
     function isJSONArrayString(str) {
         if (typeof str == 'string') {
             try {

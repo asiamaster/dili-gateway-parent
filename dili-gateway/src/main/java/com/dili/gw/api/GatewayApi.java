@@ -5,12 +5,14 @@ import com.dili.gw.domain.GatewayRoutes;
 import com.dili.gw.service.DynamicRouteService;
 import com.dili.gw.utils.RouteDefinitionUtils;
 import com.dili.ss.domain.BaseOutput;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,19 +36,37 @@ public class GatewayApi {
     }
 
     /**
-     * 加载路由信息
+     * 重新加载路由信息
      * @param gatewayRoutes
      * @return
      */
-    @PostMapping("/load")
-    public BaseOutput<String> load(@RequestBody List<GatewayRoutes> gatewayRoutes){
+    @PostMapping("/reload")
+    public BaseOutput<String> reload(@RequestBody List<GatewayRoutes> gatewayRoutes){
         try {
-            dynamicRouteService.load(gatewayRoutes);
+            dynamicRouteService.reload(gatewayRoutes);
             return BaseOutput.success();
         } catch (Exception e) {
             e.printStackTrace();
             return BaseOutput.failure(e.getMessage());
         }
+    }
+
+    /**
+     * 批量验证路由信息
+     * @param gatewayRoutes
+     * @return
+     */
+    @PostMapping("/validate")
+    public BaseOutput<String> validate(@RequestBody List<GatewayRoutes> gatewayRoutes){
+        List<RouteDefinition> routeDefinitions = new ArrayList<>(gatewayRoutes.size());
+        gatewayRoutes.forEach(t->{
+            routeDefinitions.add(RouteDefinitionUtils.assembleRouteDefinition(t));
+        });
+        String validate = dynamicRouteService.validate(routeDefinitions);
+        if(StringUtils.isBlank(validate)){
+            return BaseOutput.success();
+        }
+        return BaseOutput.failure(validate);
     }
 
     /**

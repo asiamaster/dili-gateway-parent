@@ -45,8 +45,7 @@ public class RouteController {
     @PostMapping("/add.action")
     @ResponseBody
     public BaseOutput<String> add(@ModelAttribute GatewayRoutes gatewayRoutes) {
-        this.gatewayRoutesService.insertSelective(gatewayRoutes);
-        return BaseOutput.success("新增成功");
+        return this.gatewayRoutesService.insertSelectiveAndRefreshRoute(gatewayRoutes);
     }
 
     /**
@@ -80,6 +79,16 @@ public class RouteController {
     @ResponseBody
     public BaseOutput<String> doEnable(Long id, Boolean enable) {
         return this.gatewayRoutesService.updateEnableAndRefreshRoute(id, enable);
+    }
+
+    /**
+     * 重加载路由
+     * @return
+     */
+    @GetMapping("/reload.action")
+    @ResponseBody
+    public BaseOutput<String> reload() {
+        return this.gatewayRoutesService.reload();
     }
 
 }

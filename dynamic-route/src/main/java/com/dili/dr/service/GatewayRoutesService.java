@@ -14,6 +14,12 @@ public interface GatewayRoutesService extends BaseService<GatewayRoutes, Long> {
      * 初始化数据源
      */
     void init();
+
+    /**
+     * 重新加载资源，等同于init()
+     * @return
+     */
+    BaseOutput<String> reload();
     /**
      * 新增路由，并更新缓存
      * @param gatewayRoutes

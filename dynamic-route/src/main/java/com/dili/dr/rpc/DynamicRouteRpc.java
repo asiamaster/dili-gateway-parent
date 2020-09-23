@@ -44,11 +44,20 @@ public interface DynamicRouteRpc {
     BaseOutput<String> del(@PathVariable("routeId") String routeId);
 
     /**
-     * 加载路由
+     * 验证路由
      * @param gatewayRoutes
      * @return
      */
 //    @POST("/api/route/load")
-    @RequestMapping(value = "/api/route/load", method = RequestMethod.POST)
-    BaseOutput<String> load(@RequestBody List<GatewayRoutes> gatewayRoutes);
+    @RequestMapping(value = "/api/route/validate", method = RequestMethod.POST)
+    BaseOutput<String> validate(@RequestBody List<GatewayRoutes> gatewayRoutes);
+
+    /**
+     * 重新加载路由
+     * @param gatewayRoutes
+     * @return
+     */
+//    @POST("/api/route/reload")
+    @RequestMapping(value = "/api/route/reload", method = RequestMethod.POST)
+    BaseOutput<String> reload(@RequestBody List<GatewayRoutes> gatewayRoutes);
 }

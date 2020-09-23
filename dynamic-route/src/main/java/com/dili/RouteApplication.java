@@ -15,7 +15,7 @@ import tk.mybatis.spring.annotation.MapperScan;
  * 由MyBatis Generator工具自动生成
  */
 @SpringBootApplication
-@ComponentScan(basePackages={"com.dili.ss", "com.dili.dr", "com.dili.uap.sdk"})
+@ComponentScan(basePackages={"com.dili.ss", "com.dili.dr", "com.dili.uap.sdk", "com.dili.commons.rabbitmq"})
 @MapperScan(basePackages = {"com.dili.dr.mapper", "com.dili.ss.dao"})
 @RestfulScan({"com.dili.uap.sdk.rpc"})
 @EnableDiscoveryClient
