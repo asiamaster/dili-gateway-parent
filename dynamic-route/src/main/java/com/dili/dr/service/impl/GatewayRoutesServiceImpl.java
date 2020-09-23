@@ -9,6 +9,8 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.exception.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +20,11 @@ import javax.annotation.PostConstruct;
 @Service
 public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Long> implements GatewayRoutesService {
 
+    protected static final Logger log = LoggerFactory.getLogger(GatewayRoutesServiceImpl.class);
     @Autowired
     private DynamicRouteRpc dynamicRouteRpc;
+//    @Autowired
+//    private MsgService msgService;
 
     public GatewayRoutesMapper getActualDao() {
         return (GatewayRoutesMapper)getDao();
@@ -28,7 +33,11 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
     @Override
     @PostConstruct
     public void init() {
-        dynamicRouteRpc.load(list(null));
+        BaseOutput<String> output = dynamicRouteRpc.load(list(null));
+        if(!output.isSuccess()) {
+            log.error("网关启动加载失败"+output.getMessage());
+        }
+//        msgService.send(list(null));
     }
 
     @Override
