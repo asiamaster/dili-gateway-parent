@@ -40,13 +40,17 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
 //        if(!output.isSuccess()) {
 //            log.error("网关启动加载失败"+output.getMessage());
 //        }
-        List<GatewayRoutes> list = list(null);
-        BaseOutput<String> baseOutput = dynamicRouteRpc.validate(list);
-        if(!baseOutput.isSuccess()) {
-            log.error("网关加载失败:"+baseOutput.getMessage());
-            return;
+        try {
+            List<GatewayRoutes> list = list(null);
+            BaseOutput<String> baseOutput = dynamicRouteRpc.validate(list);
+            if(!baseOutput.isSuccess()) {
+                log.error("网关加载失败:"+baseOutput.getMessage());
+                return;
+            }
+            msgService.send(list);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        msgService.send(list);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.dili.gw.component;
 
 import com.alibaba.fastjson.JSONArray;
 import com.dili.gw.domain.GatewayRoutes;
-import com.dili.gw.glossary.RouteConstant;
 import com.dili.gw.service.DynamicRouteService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +31,12 @@ public class RoutingListener {
      * @param message
      * @throws Exception
      */
-    @RabbitListener(queues = RouteConstant.MQ_DR_ROUTING_QUEUE, concurrency = "10")
+//    @RabbitListener(queues = "#{rabbitMQConfig.MQ_DR_ROUTING_QUEUE}")
+    @RabbitListener(queues = "#{rabbitMQConfig.MQ_DR_ROUTING_QUEUE}")
     public void businessLogger(Channel channel, Message message) {
-        log.info("收到消息: " + message);
         try {
             String data = new String(message.getBody(), "UTF-8");
+            log.info("解析消息内容: " + data);
             List<GatewayRoutes> gatewayRoutes = JSONArray.parseArray(data, GatewayRoutes.class);
             dynamicRouteService.reload(gatewayRoutes);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
