@@ -1,6 +1,6 @@
 package com.dili.dr.boot;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -16,10 +16,24 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     public static final String MQ_DR_TOPIC_EXCHANGE = "dili.dr.topicExchange";
+
     /**
-     * MQ 路由Key
+     * 同步路由Key
      */
     public static final String MQ_DR_ROUTING_KEY = "dili.dr.routingKey";
+
+    /**
+     * 新增路由Key
+     */
+    public static final String MQ_DR_ADD_KEY = "dili.dr.addKey";
+    /**
+     * 修改路由Key
+     */
+    public static final String MQ_DR_UPDATE_KEY = "dili.dr.updateKey";
+    /**
+     * 删除路由Key
+     */
+    public static final String MQ_DR_DELETE_KEY = "dili.dr.deleteKey";
 
     @Bean
     public MessageConverter messageConverter() {

@@ -4,12 +4,11 @@ import com.dili.dr.domain.GatewayRouteDefinition;
 import com.dili.dr.domain.GatewayRoutes;
 import com.dili.dr.mapper.GatewayRoutesMapper;
 import com.dili.dr.rpc.DynamicRouteRpc;
+import com.dili.dr.service.GatewayMsgService;
 import com.dili.dr.service.GatewayRoutesService;
-import com.dili.dr.service.MsgService;
 import com.dili.ss.base.BaseServiceImpl;
-import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
-import com.dili.ss.exception.BusinessException;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
     @Autowired
     private DynamicRouteRpc dynamicRouteRpc;
     @Autowired
-    private MsgService msgService;
+    private GatewayMsgService gatewayMsgService;
 
     public GatewayRoutesMapper getActualDao() {
         return (GatewayRoutesMapper)getDao();
@@ -47,7 +46,7 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
                 log.error("网关加载失败:"+baseOutput.getMessage());
                 return;
             }
-            msgService.send(list);
+            gatewayMsgService.reload(list);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,13 +55,12 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
     @Override
     public BaseOutput<String> reload(){
         List<GatewayRoutes> list = list(null);
-
         try {
             BaseOutput<String> baseOutput = dynamicRouteRpc.validate(list);
             if(!baseOutput.isSuccess()) {
                 return BaseOutput.failure("网关启动加载失败:"+baseOutput.getMessage());
             }
-            msgService.send(list);
+            gatewayMsgService.reload(list);
             return BaseOutput.success();
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,23 +77,25 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
         if(!list.isEmpty()){
             return BaseOutput.failure("路由id[" + gatewayRoutes.getRouteId() + "]重复");
         }
-        super.insertSelective(gatewayRoutes);
-        BaseOutput<String> output = dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
-        if(!output.isSuccess()){
-            throw new BusinessException(ResultCode.UNSUPPORTED_MEDIA_TYPE, output.getMessage());
+        BaseOutput<String> baseOutput = dynamicRouteRpc.validate(Lists.newArrayList(gatewayRoutes));
+        if(!baseOutput.isSuccess()) {
+            return BaseOutput.failure("新增失败:"+baseOutput.getMessage());
         }
-        return output;
+        super.insertSelective(gatewayRoutes);
+        gatewayMsgService.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
+        return BaseOutput.success();
     }
 
     @Override
     @Transactional
     public BaseOutput<String> updateSelectiveAndRefreshRoute(GatewayRoutes gatewayRoutes) {
-        super.updateSelective(gatewayRoutes);
-        BaseOutput<String> output = dynamicRouteRpc.update(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
-        if(!output.isSuccess()){
-            throw new BusinessException(ResultCode.UNSUPPORTED_MEDIA_TYPE, output.getMessage());
+        BaseOutput<String> baseOutput = dynamicRouteRpc.validate(Lists.newArrayList(gatewayRoutes));
+        if(!baseOutput.isSuccess()) {
+            return BaseOutput.failure("修改失败:"+baseOutput.getMessage());
         }
-        return output;
+        super.updateSelective(gatewayRoutes);
+        gatewayMsgService.update(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
+        return BaseOutput.success();
     }
 
     @Override
@@ -109,15 +109,12 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
         }
         GatewayRoutes gatewayRoutes1 = list.get(0);
         delete(gatewayRoutes1.getId());
-        //如果是禁用状态，则直接返回成功
+        //如果是禁用状态，则直接返回成功，不用再通知网关停用该路由
         if(!gatewayRoutes1.getEnabled()){
             return BaseOutput.success();
         }
-        BaseOutput<String> output = dynamicRouteRpc.del(routeId);
-        if(!output.isSuccess()){
-            throw new BusinessException(ResultCode.UNSUPPORTED_MEDIA_TYPE, output.getMessage());
-        }
-        return output;
+        gatewayMsgService.del(routeId);
+        return BaseOutput.success();
     }
 
     @Override
@@ -126,7 +123,12 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
         GatewayRoutes gatewayRoutes = get(id);
         gatewayRoutes.setEnabled(enable);
         updateSelective(gatewayRoutes);
-        return enable ? dynamicRouteRpc.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes)) : dynamicRouteRpc.del(gatewayRoutes.getRouteId());
+        if(enable){
+            gatewayMsgService.add(gatewayRoutes2GatewayRouteDefinition(gatewayRoutes));
+        }else{
+            gatewayMsgService.del(gatewayRoutes.getRouteId());
+        }
+        return BaseOutput.success();
     }
 
     /**

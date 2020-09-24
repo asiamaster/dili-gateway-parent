@@ -34,7 +34,7 @@ public interface DynamicRouteRpc {
 
     /**
      * 根据routeId删除路由
-     * @param id
+     * @param routeId
      * @return
      */
 //    @POST("/api/route/del")

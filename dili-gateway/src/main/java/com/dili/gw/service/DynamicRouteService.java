@@ -19,6 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,6 +55,10 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
     public void load(List<GatewayRoutes> gatewayRoutes) {
         gatewayRoutes.forEach(t ->{
 //            add(RouteDefinitionUtils.assembleRouteDefinition(t));
+            //忽略停用的路由
+            if(!t.getEnabled()){
+                return;
+            }
             RouteDefinition routeDefinition = RouteDefinitionUtils.assembleRouteDefinition(t);
             String s = validRouteDefinition(routeDefinition);
             if(s != null){
@@ -96,6 +101,16 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
             if(s != null){
                 return s;
             }
+            Flux<RouteDefinition> routeDefinitions = routeDefinitionWriter.getRouteDefinitions();
+            routeDefinitions.collectList().subscribe(t -> {
+                if(!t.isEmpty()) {
+                    t.stream().forEach(item -> {
+                        if(item.getId().equals(definition.getId())){
+                            throw new AppException("路由id["+item.getId()+"]已经存在");
+                        }
+                    });
+                }
+            });
             routeDefinitionWriter.save(Mono.just(definition)).subscribe();
             notifyChanged();
             return null;
@@ -110,10 +125,36 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
      * @return
      */
     public String validate(List<RouteDefinition> definitions) {
+        Flux<RouteDefinition> routeDefinitions = routeDefinitionWriter.getRouteDefinitions();
         for(RouteDefinition routeDefinition : definitions) {
-            String s = validRouteDefinition(routeDefinition);
+            String s = validDuplicate(routeDefinitions, routeDefinition);
             if (s != null) {
                 return s;
+            }
+            s = validRouteDefinition(routeDefinition);
+            if (s != null) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 验证路由是否和内存中重复
+     * @param routeDefinitions
+     * @param routeDefinition
+     * @return
+     */
+    private String validDuplicate(Flux<RouteDefinition> routeDefinitions, RouteDefinition routeDefinition){
+        List<RouteDefinition> routeDefinitionList = new ArrayList<>();
+        routeDefinitions.collectList().subscribe(t -> {
+            if(!t.isEmpty()) {
+                routeDefinitionList.addAll(t);
+            }
+        });
+        for (RouteDefinition definition : routeDefinitionList) {
+            if(definition.getId().equals(routeDefinition.getId())){
+                return "路由id["+definition.getId()+"]已经存在";
             }
         }
         return null;
@@ -129,7 +170,7 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
             routeDefinitions.collectList().subscribe(t -> {
                 if(!t.isEmpty()) {
                     t.stream().forEach(item -> {
-                        delete(item.getId());
+                        this.routeDefinitionWriter.delete(Mono.just(item.getId())).subscribe();
                     });
                     notifyChanged();
                 }
