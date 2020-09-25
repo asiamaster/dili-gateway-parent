@@ -39,8 +39,8 @@ public interface DynamicRouteRpc {
      */
 //    @POST("/api/route/del")
 //    @RequestMapping(value = "/api/route/del", method = RequestMethod.DELETE)
-    @DeleteMapping("/api/route/del/{routeId}")
 //    BaseOutput<String> del(@RequestParam("id") String id);
+    @DeleteMapping("/api/route/del/{routeId}")
     BaseOutput<String> del(@PathVariable("routeId") String routeId);
 
     /**
@@ -48,9 +48,16 @@ public interface DynamicRouteRpc {
      * @param gatewayRoutes
      * @return
      */
-//    @POST("/api/route/load")
     @RequestMapping(value = "/api/route/validate", method = RequestMethod.POST)
     BaseOutput<String> validate(@RequestBody List<GatewayRoutes> gatewayRoutes);
+
+    /**
+     * 验证路由，包括验重
+     * @param gatewayRoutes
+     * @return
+     */
+    @RequestMapping(value = "/api/route/validateWithDuplicate", method = RequestMethod.POST)
+    BaseOutput<String> validateWithDuplicate(@RequestBody List<GatewayRoutes> gatewayRoutes);
 
     /**
      * 重新加载路由

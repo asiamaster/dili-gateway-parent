@@ -120,11 +120,11 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
     }
 
     /**
-     * 批量验证路由配置
+     * 批量验证路由配置，包括验重
      * @param definitions
      * @return
      */
-    public String validate(List<RouteDefinition> definitions) {
+    public String validateWithDuplicate(List<RouteDefinition> definitions) {
         Flux<RouteDefinition> routeDefinitions = routeDefinitionWriter.getRouteDefinitions();
         for(RouteDefinition routeDefinition : definitions) {
             String s = validDuplicate(routeDefinitions, routeDefinition);
@@ -132,6 +132,21 @@ public class DynamicRouteService implements ApplicationEventPublisherAware {
                 return s;
             }
             s = validRouteDefinition(routeDefinition);
+            if (s != null) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 批量验证路由配置
+     * @param definitions
+     * @return
+     */
+    public String validate(List<RouteDefinition> definitions) {
+        for(RouteDefinition routeDefinition : definitions) {
+            String s = validRouteDefinition(routeDefinition);
             if (s != null) {
                 return s;
             }

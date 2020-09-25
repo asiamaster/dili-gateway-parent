@@ -77,7 +77,7 @@ public class GatewayRoutesServiceImpl extends BaseServiceImpl<GatewayRoutes, Lon
         if(!list.isEmpty()){
             return BaseOutput.failure("路由id[" + gatewayRoutes.getRouteId() + "]重复");
         }
-        BaseOutput<String> baseOutput = dynamicRouteRpc.validate(Lists.newArrayList(gatewayRoutes));
+        BaseOutput<String> baseOutput = dynamicRouteRpc.validateWithDuplicate(Lists.newArrayList(gatewayRoutes));
         if(!baseOutput.isSuccess()) {
             return BaseOutput.failure("新增失败:"+baseOutput.getMessage());
         }

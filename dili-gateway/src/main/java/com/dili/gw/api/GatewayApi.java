@@ -58,11 +58,21 @@ public class GatewayApi {
      */
     @PostMapping("/validate")
     public BaseOutput<String> validate(@RequestBody List<GatewayRoutes> gatewayRoutes){
-        List<RouteDefinition> routeDefinitions = new ArrayList<>(gatewayRoutes.size());
-        gatewayRoutes.forEach(t->{
-            routeDefinitions.add(RouteDefinitionUtils.assembleRouteDefinition(t));
-        });
-        String validate = dynamicRouteService.validate(routeDefinitions);
+        String validate = dynamicRouteService.validate(convertRouteDefinition(gatewayRoutes));
+        if(StringUtils.isBlank(validate)){
+            return BaseOutput.success();
+        }
+        return BaseOutput.failure(validate);
+    }
+
+    /**
+     * 批量验证路由信息
+     * @param gatewayRoutes
+     * @return
+     */
+    @PostMapping("/validateWithDuplicate")
+    public BaseOutput<String> validateWithDuplicate(@RequestBody List<GatewayRoutes> gatewayRoutes){
+        String validate = dynamicRouteService.validateWithDuplicate(convertRouteDefinition(gatewayRoutes));
         if(StringUtils.isBlank(validate)){
             return BaseOutput.success();
         }
@@ -110,4 +120,16 @@ public class GatewayApi {
         return errorMsg == null ? BaseOutput.success() : BaseOutput.failure(errorMsg);
     }
 
+    /**
+     * 类型转换
+     * @param gatewayRoutes
+     * @return
+     */
+    private List<RouteDefinition> convertRouteDefinition(List<GatewayRoutes> gatewayRoutes){
+        List<RouteDefinition> routeDefinitions = new ArrayList<>(gatewayRoutes.size());
+        gatewayRoutes.forEach(t->{
+            routeDefinitions.add(RouteDefinitionUtils.assembleRouteDefinition(t));
+        });
+        return routeDefinitions;
+    }
 }
