@@ -15,6 +15,7 @@ http://git3.nong12.com/middle-platform/dili-gateway-parent.git
 server.port=8285
 redis.enable=true
 
+
 spring.application.name=dili-gateway
 
 # 跨域配置
@@ -26,7 +27,9 @@ spring.cloud.gateway.globalcors.cors-configurations.'[/**]'.allow-credentials=tr
 
 #spring cloud
 #nacos.discovery
+spring.cloud.nacos.discovery.server-addr=nacos.diligrp.com:8848
 spring.cloud.nacos.discovery.group=MICROSERVICE
+spring.cloud.nacos.discovery.namespace=54c39cfe-d1c4-4022-a94b-a3486c5927fc
 spring.cloud.nacos.discovery.service=gateway-service
 
 #logback
@@ -79,6 +82,16 @@ spring.redis.lettuce.pool.max-idle=8
 spring.redis.lettuce.pool.min-idle=0
 # 关闭超时时间
 spring.redis.lettuce.shutdown-timeout=100
+
+##rabbitmq
+spring.rabbitmq.host=192.168.41.13
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=uap
+spring.rabbitmq.password=xWDhgn6f7gncvjLaIrro
+spring.rabbitmq.virtual-host=/uap
+#spring.rabbitmq.listener.type=SIMPLE
+spring.rabbitmq.listener.simple.retry.enabled=true
+spring.rabbitmq.listener.simple.retry.max-attempts=3
 ```
 # 2 路由
 ## 2.1 域名和端口
@@ -200,5 +213,23 @@ error.page.noLogin=error/uapNoLogin
 error.page.loginPage=https://uap.diligrp.com/login/toLogin.html
 #用于RPC
 uap.contextPath=https://uap.diligrp.com
-project.serverPath=https://route.diligrp.com:8286
+project.serverPath=https://route.diligrp.com
+```
+
+## 2.4 dynamic-route-prod.properties配置
+```
+#mysql
+spring.datasource.url=jdbc:mysql://192.168.41.17:3306/dili_gateway?createDatabaseIfNotExist=true&autoReconnect=true&useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=GMT%2B8
+spring.datasource.username=appAccPayor
+spring.datasource.password=iTDYVBtI6MX4NQ3Er2Oh
+
+##rabbitmq
+spring.rabbitmq.host=192.168.41.13
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=uap
+spring.rabbitmq.password=xWDhgn6f7gncvjLaIrro
+spring.rabbitmq.virtual-host=/uap
+#spring.rabbitmq.listener.type=SIMPLE
+spring.rabbitmq.listener.simple.retry.enabled=true
+spring.rabbitmq.listener.simple.retry.max-attempts=3
 ```
