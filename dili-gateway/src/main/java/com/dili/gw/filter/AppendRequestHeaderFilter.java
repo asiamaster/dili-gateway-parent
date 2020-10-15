@@ -1,6 +1,7 @@
 package com.dili.gw.filter;
 
 import com.alibaba.fastjson.JSONArray;
+import com.dili.gw.consts.GatewayConsts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -32,7 +33,7 @@ public class AppendRequestHeaderFilter implements GlobalFilter, Ordered {
 //        ServerWebExchange build = exchange.mutate().request(host).build();
         //添加网关请求url
         String path = exchange.getRequest().getURI().getPath();
-        ServerHttpRequest host = exchange.getRequest().mutate().header("gatewayUrl", path).build();
+        ServerHttpRequest host = exchange.getRequest().mutate().header(GatewayConsts.GATEWAY_REQUEST_URI, path).build();
         ServerWebExchange build = exchange.mutate().request(host).build();
         return chain.filter(build);
     }

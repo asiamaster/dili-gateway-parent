@@ -1,5 +1,6 @@
 package com.dili.gw.filter;
 
+import com.dili.gw.uap.ManageConfig;
 import com.dili.gw.uap.UserRedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -17,6 +18,8 @@ public class UapAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Ob
 
     @Autowired
     private UserRedis userRedis;
+    @Autowired
+    private ManageConfig manageConfig;
 
     public UapAuthGatewayFilterFactory() {
         super(Object.class);
@@ -25,6 +28,6 @@ public class UapAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Ob
     @Override
     public GatewayFilter apply(Object config)
     {
-        return new UapAuthGatewayFilter(userRedis);
+        return new UapAuthGatewayFilter(userRedis, manageConfig);
     }
 }

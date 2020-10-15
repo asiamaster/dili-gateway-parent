@@ -2,6 +2,8 @@ package com.dili.gw.filter;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dili.gw.consts.GatewayConsts;
+import com.dili.gw.uap.ManageConfig;
 import com.dili.gw.uap.UserRedis;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -28,8 +31,11 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
 
     private UserRedis userRedis;
 
-    public UapAuthGatewayFilter(UserRedis userRedis){
+    private ManageConfig manageConfig;
+
+    public UapAuthGatewayFilter(UserRedis userRedis, ManageConfig manageConfig){
         this.userRedis = userRedis;
+        this.manageConfig = manageConfig;
     }
     /**
      * 全局过滤器 核心方法
@@ -42,6 +48,13 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
         logger.debug("request = {}", JSONArray.toJSONString( exchange.getRequest()) );
         ServerHttpResponse response = exchange.getResponse();
         ServerHttpRequest request = exchange.getRequest();
+        HttpHeaders headers = request.getHeaders();
+        String gatewayRequestUri = headers.getFirst(GatewayConsts.GATEWAY_REQUEST_URI);
+        if(manageConfig.isExclude(gatewayRequestUri)){
+            ServerHttpRequest host = exchange.getRequest().mutate().build();
+            ServerWebExchange build = exchange.mutate().request(host).build();
+            return chain.filter(build);
+        }
         //获取header的参数
         String sessionId = request.getHeaders().getFirst("sessionId");
         if (StringUtils.isNotBlank(sessionId)){
@@ -61,6 +74,10 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
         }
     }
 
+    /**
+     * 构建响应数据
+     * @return
+     */
     private byte[] getWrapData() {
         BaseOutput baseOutput = BaseOutput.failure(ResultCode.FORBIDDEN, "鉴权失败");
         return JSONObject.toJSONString(baseOutput).getBytes();
