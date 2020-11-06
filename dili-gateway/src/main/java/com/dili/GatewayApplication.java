@@ -1,5 +1,6 @@
 package com.dili;
 
+import com.dili.ss.retrofitful.annotation.RestfulScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -16,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @ComponentScan(basePackages={"com.dili.ss", "com.dili.gw"})
 @EnableDiscoveryClient
+@RestfulScan({ "com.dili.gw.rpc" })
+//@DTOScan(value = { "com.dili.ss", "com.dili.uap" })
 //@EnableFeignClients
 public class GatewayApplication {
 
