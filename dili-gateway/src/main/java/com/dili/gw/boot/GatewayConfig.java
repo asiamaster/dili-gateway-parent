@@ -20,6 +20,10 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class GatewayConfig {
 
+    /**
+     * 内存路由配置
+     * @return
+     */
     @Bean
     @ConditionalOnMissingBean(RouteDefinitionRepository.class)
     public InMemoryRouteDefinitionRepository inMemoryRouteDefinitionRepository() {
@@ -30,6 +34,11 @@ public class GatewayConfig {
 //    public RouteDefinitionRouteLocator routeDefinitionRouteLocator(){
 //        return new RouteDefinitionRouteLocator();
 //    }
+
+    /**
+     * 跨域过滤器
+     * @return
+     */
     @Bean
     public WebFilter corsFilter() {
         return (ServerWebExchange ctx, WebFilterChain chain) -> {

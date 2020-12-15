@@ -42,6 +42,9 @@ public class GatewayApplication {
     }
 
     public static void main(String[] args) {
+        //解决网关菜单，不显示请求链路和API管理的菜单项
+        //还可以在服务的启动命令中加上 -Dcsp.sentinel.app.type=1
+        System.setProperty("csp.sentinel.app.type", "1");
         SpringApplication.run(GatewayApplication.class, args);
     }
 
