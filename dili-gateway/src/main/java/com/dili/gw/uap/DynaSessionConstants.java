@@ -15,7 +15,8 @@ public class DynaSessionConstants {
     // sessionId - userId和UserIdSessionData的Redis 过期时间(秒)
     // 默认为30分钟
     private Long SESSION_TIMEOUT;
-
+    // 默认为30天
+    private Long TOKEN_TIMEOUT;
 
     /**
      * 获取session超时时间
@@ -34,4 +35,20 @@ public class DynaSessionConstants {
         SESSION_TIMEOUT = sessionTimeout;
     }
 
+    /**
+     * 获取token超时时间
+     * @return
+     */
+    public Long getTokenTimeout() {
+        return TOKEN_TIMEOUT;
+    }
+
+    /**
+     * 设置token超时时间
+     * @param tokenTimeout
+     */
+    @Value("${uap.tokenTimeout:2592000}")
+    public void setTokenTimeout(Long tokenTimeout) {
+        TOKEN_TIMEOUT = tokenTimeout;
+    }
 }

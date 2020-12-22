@@ -53,10 +53,25 @@ public class SessionConstants {
     public static final String KICK_OLDSESSIONID_KEY = APPLICATION_NAME + "manage:kickOldSessionId:";
     // 限制用户唯一登陆 - END
 
-    //登录密码错误锁定的key
-    public static final String USER_PWD_ERROR_KEY = APPLICATION_NAME + "manage:user_pwd_error:";
 
-    //Cookie key
+    // -----------------------------  Token key  -----------------------------
+    // token的key prefix，后面加token
+    public static final String TOKEN_KEY_PREFIX = APPLICATION_NAME + "DILI_MANAGE_TOKEN_";
+    // key:userId - value:token
+    public static final String USERID_TOKEN_KEY = APPLICATION_NAME + "manage:userIdToken:userId:";
+    // userSystem(用户和系统关系)：token方式
+    public static final String USER_SYSTEM_TOKEN_KEY = APPLICATION_NAME + "manage:token:userSystem::userId:";
+    // userUrl(用户和菜单URL关系)
+    public static final String USER_MENU_URL_TOKEN_KEY = APPLICATION_NAME + "manage:token:userMenuUrl:userId:";
+    // key:token:userId - value:resources Set
+    public static final String USER_RESOURCE_CODE_TOKEN_KEY = APPLICATION_NAME + "manage:token:userResourceCode:userId:";
+    // 用户数据权限 redis的key
+    public static final String USER_DATA_AUTH_TOKEN_KEY = APPLICATION_NAME + "manage:token:dataAuth:userId:";
+    // token - value:userId
+    public static final String TOKEN_USERID_KEY = APPLICATION_NAME + "manage:tokenUserId:token:";
+    // Cookie, Request, Header, Session中取sessionId的key
+    public static final String TOKEN = APPLICATION_NAME + "Token";
+    // -----------------------------  Cookie key  -----------------------------
     //Cookie过期时间(秒) 1天
     public  static Integer COOKIE_TIMEOUT = 86400;
     //登录会话id

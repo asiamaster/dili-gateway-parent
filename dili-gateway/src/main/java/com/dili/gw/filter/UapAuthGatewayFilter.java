@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.gw.consts.GatewayConsts;
 import com.dili.gw.uap.ManageConfig;
+import com.dili.gw.uap.SessionConstants;
 import com.dili.gw.uap.UserRedis;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -57,21 +57,30 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
         }
         //获取header的参数
         String sessionId = request.getHeaders().getFirst("sessionId");
-        if (StringUtils.isNotBlank(sessionId)){
+
+        if (sessionId != null){
             Long sessionUserId = userRedis.getSessionUserId(sessionId);
             if(sessionUserId != null) {
-                ServerHttpRequest host = exchange.getRequest().mutate().header("sessionUserId", sessionUserId.toString()).build();
+                ServerHttpRequest host = exchange.getRequest().mutate().header(SessionConstants.SESSION_ID, sessionUserId.toString()).build();
                 ServerWebExchange build = exchange.mutate().request(host).build();
                 return chain.filter(build);
             }
+            //有sessionId，验证不通过，则不再验证token
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
         }
-        else{
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-            return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
-//            return response.setComplete();
+        String tokenId = request.getHeaders().getFirst("token");
+        if (tokenId != null){
+            String sessionUserId = userRedis.getTokenUserIdString(tokenId);
+            if(sessionUserId != null) {
+                ServerHttpRequest host = exchange.getRequest().mutate().header(SessionConstants.TOKEN, sessionUserId).build();
+                ServerWebExchange build = exchange.mutate().request(host).build();
+                return chain.filter(build);
+            }
         }
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
+//      return response.setComplete();
     }
 
     /**
