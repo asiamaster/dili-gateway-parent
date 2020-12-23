@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.gw.consts.GatewayConsts;
 import com.dili.gw.uap.ManageConfig;
-import com.dili.gw.uap.SessionConstants;
 import com.dili.gw.uap.UserRedis;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
@@ -61,7 +60,7 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
         if (sessionId != null){
             Long sessionUserId = userRedis.getSessionUserId(sessionId);
             if(sessionUserId != null) {
-                ServerHttpRequest host = exchange.getRequest().mutate().header(SessionConstants.SESSION_ID, sessionUserId.toString()).build();
+                ServerHttpRequest host = exchange.getRequest().mutate().header("sessionId", sessionId).header("userId", sessionUserId.toString()).build();
                 ServerWebExchange build = exchange.mutate().request(host).build();
                 return chain.filter(build);
             }
@@ -69,11 +68,11 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
         }
-        String tokenId = request.getHeaders().getFirst("token");
-        if (tokenId != null){
-            String sessionUserId = userRedis.getTokenUserIdString(tokenId);
+        String token = request.getHeaders().getFirst("token");
+        if (token != null){
+            String sessionUserId = userRedis.getTokenUserIdString(token);
             if(sessionUserId != null) {
-                ServerHttpRequest host = exchange.getRequest().mutate().header(SessionConstants.TOKEN, sessionUserId).build();
+                ServerHttpRequest host = exchange.getRequest().mutate().header("token", token).header("userId", sessionUserId).build();
                 ServerWebExchange build = exchange.mutate().request(host).build();
                 return chain.filter(build);
             }
