@@ -1,11 +1,12 @@
 package com.dili.gw.filter;
 
-import com.dili.gw.uap.ManageConfig;
-import com.dili.gw.uap.UserRedis;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dili.uap.sdk.config.ManageConfig;
+import com.dili.uap.sdk.service.AuthService;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * UAP鉴权过滤器工厂
@@ -16,9 +17,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class UapAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
-    @Autowired
-    private UserRedis userRedis;
-    @Autowired
+    @Resource
+    private AuthService authService;
+    @Resource
     private ManageConfig manageConfig;
 
     public UapAuthGatewayFilterFactory() {
@@ -28,6 +29,6 @@ public class UapAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Ob
     @Override
     public GatewayFilter apply(Object config)
     {
-        return new UapAuthGatewayFilter(userRedis, manageConfig);
+        return new UapAuthGatewayFilter(authService, manageConfig);
     }
 }

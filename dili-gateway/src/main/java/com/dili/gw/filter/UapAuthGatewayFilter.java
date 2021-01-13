@@ -3,10 +3,12 @@ package com.dili.gw.filter;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.gw.consts.GatewayConsts;
-import com.dili.gw.uap.ManageConfig;
-import com.dili.gw.uap.UserRedis;
 import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.uap.sdk.config.ManageConfig;
+import com.dili.uap.sdk.constant.SessionConstants;
+import com.dili.uap.sdk.domain.UserTicket;
+import com.dili.uap.sdk.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -28,12 +30,12 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
 
     static Logger logger = LoggerFactory.getLogger(UapAuthGatewayFilter.class);
 
-    private UserRedis userRedis;
+    private AuthService authService;
 
     private ManageConfig manageConfig;
 
-    public UapAuthGatewayFilter(UserRedis userRedis, ManageConfig manageConfig){
-        this.userRedis = userRedis;
+    public UapAuthGatewayFilter(AuthService authService, ManageConfig manageConfig){
+        this.authService = authService;
         this.manageConfig = manageConfig;
     }
     /**
@@ -48,6 +50,7 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
         ServerHttpResponse response = exchange.getResponse();
         ServerHttpRequest request = exchange.getRequest();
         HttpHeaders headers = request.getHeaders();
+
         String gatewayRequestUri = headers.getFirst(GatewayConsts.GATEWAY_REQUEST_URI);
         if(manageConfig.isExclude(gatewayRequestUri)){
             ServerHttpRequest host = exchange.getRequest().mutate().build();
@@ -55,30 +58,24 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
             return chain.filter(build);
         }
         //获取header的参数
-        String sessionId = request.getHeaders().getFirst("sessionId");
-
-        if (sessionId != null){
-            Long sessionUserId = userRedis.getSessionUserId(sessionId);
-            if(sessionUserId != null) {
-                ServerHttpRequest host = exchange.getRequest().mutate().header("sessionId", sessionId).header("userId", sessionUserId.toString()).build();
-                ServerWebExchange build = exchange.mutate().request(host).build();
-                return chain.filter(build);
-            }
-            //有sessionId，验证不通过，则不再验证token
+        String accessToken = headers.getFirst(SessionConstants.ACCESS_TOKEN_KEY);
+        String refreshToken = headers.getFirst(SessionConstants.REFRESH_TOKEN_KEY);
+        if(accessToken == null || refreshToken == null){
+            //验证不通过
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
         }
-        String token = request.getHeaders().getFirst("token");
-        if (token != null){
-            String sessionUserId = userRedis.getTokenUserIdString(token);
-            if(sessionUserId != null) {
-                ServerHttpRequest host = exchange.getRequest().mutate().header("token", token).header("userId", sessionUserId).build();
-                ServerWebExchange build = exchange.mutate().request(host).build();
-                return chain.filter(build);
-            }
+        UserTicket userTicket = authService.getUserTicket(accessToken, refreshToken);
+        if(userTicket == null) {
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
         }
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
+        ServerHttpRequest host = exchange.getRequest().mutate()
+                .header("accessToken", accessToken)
+                .header("refreshToken", refreshToken)
+                .header("userId", userTicket.getId().toString()).build();
+        ServerWebExchange build = exchange.mutate().request(host).build();
+        return chain.filter(build);
 //      return response.setComplete();
     }
 
@@ -96,11 +93,11 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
         return 0;
     }
 
-    public UserRedis getUserRedis() {
-        return userRedis;
+    public AuthService getAuthService() {
+        return authService;
     }
 
-    public void setUserRedis(UserRedis userRedis) {
-        this.userRedis = userRedis;
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
     }
 }
