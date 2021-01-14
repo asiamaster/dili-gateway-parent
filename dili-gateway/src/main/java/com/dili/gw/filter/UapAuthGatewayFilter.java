@@ -1,6 +1,5 @@
 package com.dili.gw.filter;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.gw.consts.GatewayConsts;
 import com.dili.ss.constant.ResultCode;
@@ -9,6 +8,7 @@ import com.dili.uap.sdk.config.ManageConfig;
 import com.dili.uap.sdk.constant.SessionConstants;
 import com.dili.uap.sdk.domain.UserTicket;
 import com.dili.uap.sdk.service.AuthService;
+import com.dili.uap.sdk.util.WebContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -46,11 +46,12 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
      */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        logger.debug("request = {}", JSONArray.toJSONString( exchange.getRequest()) );
+//        logger.debug("request = {}", JSONArray.toJSONString( exchange.getRequest()) );
         ServerHttpResponse response = exchange.getResponse();
         ServerHttpRequest request = exchange.getRequest();
         HttpHeaders headers = request.getHeaders();
-
+        WebContent.put("req", request);
+        WebContent.put("resp", response);
         String gatewayRequestUri = headers.getFirst(GatewayConsts.GATEWAY_REQUEST_URI);
         if(manageConfig.isExclude(gatewayRequestUri)){
             ServerHttpRequest host = exchange.getRequest().mutate().build();
@@ -65,7 +66,7 @@ public class UapAuthGatewayFilter implements GatewayFilter, Ordered {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
         }
-        UserTicket userTicket = authService.getUserTicket(accessToken, refreshToken);
+        UserTicket userTicket = authService.getGatewayUserTicket(accessToken, refreshToken);
         if(userTicket == null) {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(getWrapData()))));
